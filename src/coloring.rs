@@ -76,7 +76,7 @@ pub fn greedy_coloring(graph: &Graph) -> Coloring {
 
 #[cfg(test)]
 mod tests {
-    use graph::Graph;
+    use graph::{ Graph, random_graph };
     use coloring:: { Coloring, check_coloring, compatible_coloring, num_colors, greedy_coloring };
 
     #[test]
@@ -186,5 +186,16 @@ mod tests {
         // Line might not be 2-colored by greedy
         // in case of unfortunate vertex ordering
         assert!(num_colors(&c) <= 3);
+    }
+
+    #[test]
+    fn greedy_random() {
+        let g = random_graph(100, 0.5);
+
+        let c = greedy_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert!(num_colors(&c) <= g.vertices().count());
+        assert!(num_colors(&c) >= 2);
     }
 }
