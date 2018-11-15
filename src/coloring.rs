@@ -67,4 +67,23 @@ mod tests {
 
         assert!(check_coloring(&g, &c));
     }
+
+    #[test]
+    fn creation_large() {
+        let mut g = Graph::new();
+        let mut c = Coloring::new();
+
+        for u in 0..100 {
+            for v in u..100 {
+                g.add_edge(u,v);
+            }
+        }
+
+        for u in 0..100 {
+            c.insert(u, u);
+        }
+
+        assert!(compatible_coloring(&g, &c));
+        assert!(check_coloring(&g, &c));
+    }
 }

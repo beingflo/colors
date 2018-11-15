@@ -3,7 +3,7 @@ use std::iter::Iterator;
 
 /// Graph datastructure implemented as a set of edges.
 /// The graph is undirected and unweighted - only the connectivity pattern of
-/// the vertices is captured. Multiple edges are also disallowed.
+/// the vertices is captured. Multiple edges and self edges are also disallowed.
 ///
 /// Vertices and edges may not be removed.
 pub struct Graph {
@@ -22,6 +22,10 @@ impl Graph {
     /// as the graph captures undirected edges.
     /// Adding an edge that already exists has no effect.
     pub fn add_edge(&mut self, mut u: usize, mut v: usize)  {
+        if u == v {
+            return;
+        }
+
         if u > v {
             let t = u;
             u = v;
@@ -80,6 +84,19 @@ mod tests {
 
         assert!(g.has_edge(2,1));
         assert!(!g.has_edge(1,3));
+    }
+
+    #[test]
+    fn insertion_large() {
+        let mut g = Graph::new();
+
+        for u in 0..100 {
+            for v in u..100 {
+                g.add_edge(u,v);
+            }
+        }
+
+        assert!(g.has_edge(40, 11));
     }
 
     #[test]
