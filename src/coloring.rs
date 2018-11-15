@@ -46,14 +46,38 @@ pub fn num_colors(coloring: &Coloring) -> usize {
 }
 
 
+/// Return a greedy coloring of the graph.
+/// There is no guaranteed about the number of colors used.
+pub fn greedy_coloring(graph: &Graph) -> Coloring {
+    let mut c = Coloring::new();
+    let n = graph.vertices().count();
+
+    for &v in graph.vertices() {
+        let mut blocked_colors = HashSet::new();
+        for u in graph.neighbors(v) {
+            if let Some(color) = c.get(u) {
+                blocked_colors.insert(*color);
+            }
+        }
+
+
+        for x in 0..n {
+            if !blocked_colors.contains(&x) {
+                c.insert(v, x);
+                break;
+            }
+        }
+    }
+
+    c
+}
+
+
 
 #[cfg(test)]
 mod tests {
     use graph::Graph;
-    use coloring::Coloring;
-    use coloring::check_coloring;
-    use coloring::compatible_coloring;
-    use coloring::num_colors;
+    use coloring:: { Coloring, check_coloring, compatible_coloring, num_colors, greedy_coloring };
 
     #[test]
     fn creation_empty() {
@@ -120,5 +144,49 @@ mod tests {
         }
 
         assert_eq!(num_colors(&c), 11);
+    }
+
+    #[test]
+    fn greedy_color() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+
+        let c = greedy_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn greedy_color2() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+        g.add_edge(1,3);
+
+        let c = greedy_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn greedy_line() {
+        let mut g = Graph::new();
+
+        for i in 0..10 {
+            g.add_edge(i, i+1);
+        }
+
+        let c = greedy_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+
+
+        println!("{:?}", c);
+        // Line might not be 2-colored by greedy
+        // in case of unfortunate vertex ordering
+        assert!(num_colors(&c) <= 2);
     }
 }
