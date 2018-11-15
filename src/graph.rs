@@ -73,6 +73,16 @@ impl Graph {
     pub fn vertices(&self) -> impl Iterator<Item=&usize> {
         self.vertices.iter()
     }
+
+    /// Returns an iterator over all the neighboring vertices in the graph
+    pub fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=&usize> + 'a> {
+        // We need to box the return type because the branches don't have the same type
+        if self.neighbors.contains_key(&v) {
+            Box::new(self.neighbors[&v].iter())
+        } else {
+            Box::new(std::iter::empty())
+        }
+    }
 }
 
 #[cfg(test)]
@@ -126,5 +136,31 @@ mod tests {
         assert!(g.edges().any(|&x| x == (1,3)));
         assert!(g.edges().any(|&x| x == (1,2)));
         assert!(!g.edges().any(|&x| x == (2,3)));
+    }
+
+    #[test]
+    fn neighbors() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+        g.add_edge(1,3);
+
+        assert!(g.neighbors(1).any(|&x| x == 2));
+        assert!(g.neighbors(1).any(|&x| x == 3));
+        assert!(g.neighbors(2).any(|&x| x == 1));
+        assert!(g.neighbors(3).any(|&x| x == 1));
+
+        assert!(!g.neighbors(1).any(|&x| x == 1));
+        assert!(!g.neighbors(2).any(|&x| x == 3));
+    }
+
+    #[test]
+    fn neighbors_empty() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+        g.add_edge(1,3);
+
+        assert!(!g.neighbors(5).any(|&x| x == 1));
     }
 }
