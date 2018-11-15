@@ -224,4 +224,22 @@ mod tests {
         assert!(num_edges > 2000);
         assert!(num_edges < 3000);
     }
+
+    #[test]
+    fn random_full() {
+        let g = random_graph(100, 1.0);
+
+        let num_edges = g.edges().count();
+
+        assert_eq!(num_edges, (100*99)/2);
+    }
+
+    #[test]
+    fn random_empty() {
+        let g = random_graph(100, 0.0);
+
+        let num_edges = g.edges().count();
+
+        assert_eq!(num_edges, 0);
+    }
 }
