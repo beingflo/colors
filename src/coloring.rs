@@ -183,10 +183,8 @@ mod tests {
 
         assert!(check_coloring(&g, &c));
 
-
-        println!("{:?}", c);
         // Line might not be 2-colored by greedy
         // in case of unfortunate vertex ordering
-        assert!(num_colors(&c) <= 2);
+        assert!(num_colors(&c) <= 3);
     }
 }
