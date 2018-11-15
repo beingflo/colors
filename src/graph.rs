@@ -119,6 +119,7 @@ pub fn random_graph(n: usize, p: f32) -> Graph {
 #[cfg(test)]
 mod tests {
     use graph::Graph;
+    use graph::random_graph;
 
     #[test]
     fn creation() {
@@ -210,5 +211,17 @@ mod tests {
         g.add_edge(2,4);
 
         assert_eq!(g.max_degree(), 3);
+    }
+
+    #[test]
+    fn random() {
+        // Expected (100*99)/2 * 0.5 = 2475 edges
+        let g = random_graph(100, 0.5);
+
+        let num_edges = g.edges().count();
+
+        // More than likely correct
+        assert!(num_edges > 2000);
+        assert!(num_edges < 3000);
     }
 }
