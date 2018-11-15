@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::collections::HashMap;
 use std::iter::Iterator;
 
 /// Graph datastructure implemented as a set of edges.
@@ -9,12 +10,14 @@ use std::iter::Iterator;
 pub struct Graph {
     edges: HashSet<(usize, usize)>,
     vertices: HashSet<usize>,
+
+    neighbors: HashMap<usize, HashSet<usize>>,
 }
 
 impl Graph {
     /// Constructs a new graph
     pub fn new() -> Self {
-        Graph { edges: HashSet::new(), vertices: HashSet::new() }
+        Graph { edges: HashSet::new(), vertices: HashSet::new(), neighbors: HashMap::new() }
     }
 
     /// Add edge to the graph
@@ -36,6 +39,18 @@ impl Graph {
 
         self.vertices.insert(u);
         self.vertices.insert(v);
+
+        if !self.neighbors.contains_key(&u) {
+            self.neighbors.insert(u, HashSet::new());
+        }
+
+        self.neighbors.get_mut(&u).unwrap().insert(v);
+
+        if !self.neighbors.contains_key(&v) {
+            self.neighbors.insert(v, HashSet::new());
+        }
+
+        self.neighbors.get_mut(&v).unwrap().insert(u);
     }
 
     /// Queries whether an edge exists in the graph.
