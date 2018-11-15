@@ -72,12 +72,47 @@ pub fn greedy_coloring(graph: &Graph) -> Coloring {
     c
 }
 
+/// Return a Largest-First-coloring of the graph attained by greedily coloring
+/// the vertices in order of decreasing degree.
+/// There is no guaranteed about the number of colors used.
+pub fn lf_coloring(graph: &Graph) -> Coloring {
+    let mut c = Coloring::new();
+    let n = graph.vertices().count();
+
+    let mut vertices: Vec<(usize, usize)> = graph.vertices().map(|u| (*u, 0)).collect();
+
+    for (v, d) in &mut vertices {
+        *d = graph.neighbors(*v).count();
+    }
+
+    vertices.sort_by(|a,b| b.1.cmp(&a.1));
+
+    for &(v, _) in &vertices {
+        let mut blocked_colors = HashSet::new();
+        for u in graph.neighbors(v) {
+            if let Some(color) = c.get(u) {
+                blocked_colors.insert(*color);
+            }
+        }
+
+
+        for x in 0..n {
+            if !blocked_colors.contains(&x) {
+                c.insert(v, x);
+                break;
+            }
+        }
+    }
+
+    c
+}
+
 
 
 #[cfg(test)]
 mod tests {
     use graph::{ Graph, random_graph };
-    use coloring:: { Coloring, check_coloring, compatible_coloring, num_colors, greedy_coloring };
+    use coloring:: { Coloring, check_coloring, compatible_coloring, num_colors, greedy_coloring, lf_coloring };
 
     #[test]
     fn creation_empty() {
@@ -197,5 +232,17 @@ mod tests {
         assert!(check_coloring(&g, &c));
         assert!(num_colors(&c) <= g.vertices().count());
         assert!(num_colors(&c) >= 2);
+    }
+
+    #[test]
+    fn lf_color() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+
+        let c = lf_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
     }
 }
