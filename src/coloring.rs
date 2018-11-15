@@ -85,5 +85,10 @@ mod tests {
 
         assert!(compatible_coloring(&g, &c));
         assert!(check_coloring(&g, &c));
+
+        c.insert(4, 5);
+
+        assert!(compatible_coloring(&g, &c));
+        assert!(!check_coloring(&g, &c));
     }
 }
