@@ -21,7 +21,7 @@ impl Graph {
     /// as the graph captures undirected edges.
     /// Adding an edge that already exists has no effect.
     pub fn add_edge(&mut self, mut u: usize, mut v: usize)  {
-        if u < v {
+        if u > v {
             let t = u;
             u = v;
             v = t;
@@ -31,7 +31,7 @@ impl Graph {
 
     /// Queries whether an edge exists in the graph.
     pub fn has_edge(&self, mut u: usize, mut v: usize) -> bool {
-        if u < v {
+        if u > v {
             let t = u;
             u = v;
             v = t;
@@ -53,6 +53,7 @@ mod tests {
     #[test]
     fn creation() {
         let g = Graph::new();
+
         assert!(!g.has_edge(0,1));
     }
 
@@ -60,6 +61,7 @@ mod tests {
     fn insertion() {
         let mut g = Graph::new();
         g.add_edge(1,2);
+
         assert!(g.has_edge(1,2));
         assert!(!g.has_edge(1,3));
     }
@@ -68,7 +70,19 @@ mod tests {
     fn insertion_reversed() {
         let mut g = Graph::new();
         g.add_edge(1,2);
+
         assert!(g.has_edge(2,1));
         assert!(!g.has_edge(1,3));
+    }
+
+    #[test]
+    fn edges() {
+        let mut g = Graph::new();
+        g.add_edge(1,2);
+        g.add_edge(1,3);
+
+        assert!(g.edges().any(|&x| x == (1,3)));
+        assert!(g.edges().any(|&x| x == (1,2)));
+        assert!(!g.edges().any(|&x| x == (2,3)));
     }
 }
