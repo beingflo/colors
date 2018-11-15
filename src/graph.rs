@@ -2,6 +2,8 @@ use std::collections::HashSet;
 use std::collections::HashMap;
 use std::iter::Iterator;
 
+use rand::random;
+
 /// Graph datastructure implemented as a set of edges.
 /// The graph is undirected and unweighted - only the connectivity pattern of
 /// the vertices is captured. Multiple edges and self edges are also disallowed.
@@ -94,6 +96,22 @@ impl Graph {
 
         max
     }
+}
+
+/// Return a random graph with n vertices where each undirected
+/// edge has probability p of occuring in the graph.
+pub fn random_graph(n: usize, p: f32) -> Graph {
+    let mut g = Graph::new();
+
+    for u in 0..n {
+        for v in u+1..n {
+            if random::<f32>() < p {
+                g.add_edge(u,v);
+            }
+        }
+    }
+
+    g
 }
 
 
