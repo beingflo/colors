@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
 use graph::Graph;
 
 /// Coloring type.
@@ -33,12 +34,23 @@ pub fn check_coloring(graph: &Graph, coloring: &Coloring) -> bool {
     return true;
 }
 
+pub fn num_colors(coloring: &Coloring) -> usize {
+    let mut colors: HashSet<usize> = HashSet::new();
+
+    for &val in coloring.values() {
+        colors.insert(val);
+    }
+
+    colors.len()
+}
+
 #[cfg(test)]
 mod tests {
     use graph::Graph;
     use coloring::Coloring;
     use coloring::check_coloring;
     use coloring::compatible_coloring;
+    use coloring::num_colors;
 
     #[test]
     fn creation_empty() {
@@ -94,5 +106,16 @@ mod tests {
 
         assert!(compatible_coloring(&g, &c));
         assert!(!check_coloring(&g, &c));
+    }
+
+    #[test]
+    fn colors() {
+        let mut c = Coloring::new();
+
+        for u in 0..100 {
+            c.insert(u, u % 11);
+        }
+
+        assert_eq!(num_colors(&c), 11);
     }
 }
