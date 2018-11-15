@@ -5,6 +5,7 @@ use graph::Graph;
 /// This maps from vertices to colors.
 pub type Coloring = HashMap<usize, usize>;
 
+/// Check whether coloring defines a color for all vertices that exist in the graph.
 pub fn compatible_coloring(graph: &Graph, coloring: &Coloring) -> bool {
     for u in graph.vertices() {
         if !coloring.contains_key(u) {
@@ -15,6 +16,9 @@ pub fn compatible_coloring(graph: &Graph, coloring: &Coloring) -> bool {
     return true;
 }
 
+/// Check whether no adjacent vertices are in conflict.
+/// 'false' indicates either a color conflict or no color define for at least
+/// one of the vertices in the graph.
 pub fn check_coloring(graph: &Graph, coloring: &Coloring) -> bool {
     if !compatible_coloring(graph, coloring) {
         return false;
