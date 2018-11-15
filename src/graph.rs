@@ -31,7 +31,9 @@ impl Graph {
             u = v;
             v = t;
         }
+
         self.edges.insert((u,v));
+
         self.vertices.insert(u);
         self.vertices.insert(v);
     }
@@ -52,6 +54,7 @@ impl Graph {
         self.edges.iter()
     }
 
+    /// Returns an iterator over all the vertices in the graph
     pub fn vertices(&self) -> impl Iterator<Item=&usize> {
         self.vertices.iter()
     }
