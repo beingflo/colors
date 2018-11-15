@@ -45,6 +45,8 @@ pub fn num_colors(coloring: &Coloring) -> usize {
     colors.len()
 }
 
+
+
 #[cfg(test)]
 mod tests {
     use graph::Graph;

@@ -64,17 +64,17 @@ impl Graph {
         self.edges.contains(&(u,v))
     }
 
-    /// Returns an itertator over all the edges in the graph
+    /// Returns an itertator over all the edges in the graph.
     pub fn edges(&self) -> impl Iterator<Item=&(usize,usize)> {
         self.edges.iter()
     }
 
-    /// Returns an iterator over all the vertices in the graph
+    /// Returns an iterator over all the vertices in the graph.
     pub fn vertices(&self) -> impl Iterator<Item=&usize> {
         self.vertices.iter()
     }
 
-    /// Returns an iterator over all the neighboring vertices in the graph
+    /// Returns an iterator over all the neighboring vertices in the graph.
     pub fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=&usize> + 'a> {
         // We need to box the return type because the branches don't have the same type
         if self.neighbors.contains_key(&v) {
@@ -83,7 +83,20 @@ impl Graph {
             Box::new(std::iter::empty())
         }
     }
+
+    /// Returns the maximum degree of any node in the graph.
+    /// That is the maximal number of neighbors any vertex has.
+    pub fn max_degree(&self) -> usize {
+        let mut max = 0;
+        for &u in self.vertices() {
+            max = max.max(self.neighbors(u).count());
+        }
+
+        max
+    }
 }
+
+
 
 #[cfg(test)]
 mod tests {
@@ -162,5 +175,22 @@ mod tests {
         g.add_edge(1,3);
 
         assert!(!g.neighbors(5).any(|&x| x == 1));
+    }
+
+    #[test]
+    fn max_degree() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+        g.add_edge(1,3);
+        g.add_edge(1,1);
+        g.add_edge(1,2);
+
+        assert_eq!(g.max_degree(), 2);
+
+        g.add_edge(2,3);
+        g.add_edge(2,4);
+
+        assert_eq!(g.max_degree(), 3);
     }
 }
