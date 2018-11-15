@@ -34,6 +34,7 @@ pub fn check_coloring(graph: &Graph, coloring: &Coloring) -> bool {
     return true;
 }
 
+/// Returns the number of colors used in the coloring.
 pub fn num_colors(coloring: &Coloring) -> usize {
     let mut colors: HashSet<usize> = HashSet::new();
 
