@@ -16,6 +16,10 @@ impl Graph {
         Graph { edges: HashSet::new() }
     }
 
+    /// Add edge to the graph
+    /// add_edge(u,v) has the same effect as add_edge(v,u)
+    /// as the graph captures undirected edges.
+    /// Adding an edge that already exists has no effect.
     pub fn add_edge(&mut self, mut u: usize, mut v: usize)  {
         if u < v {
             let t = u;
@@ -25,6 +29,7 @@ impl Graph {
         self.edges.insert((u,v));
     }
 
+    /// Queries whether an edge exists in the graph.
     pub fn has_edge(&self, mut u: usize, mut v: usize) -> bool {
         if u < v {
             let t = u;
@@ -35,4 +40,3 @@ impl Graph {
         self.edges.contains(&(u,v))
     }
 }
-
