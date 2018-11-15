@@ -1,4 +1,5 @@
 mod graph;
+mod coloring;
 
 use graph::Graph;
 

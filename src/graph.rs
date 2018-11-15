@@ -1,5 +1,5 @@
 use std::collections::HashSet;
-
+use std::iter::Iterator;
 
 /// Graph datastructure implemented as a set of edges.
 /// The graph is undirected and unweighted - only the connectivity pattern of
@@ -38,6 +38,11 @@ impl Graph {
         }
 
         self.edges.contains(&(u,v))
+    }
+
+    /// Returns an itertator over all the edges in the graph
+    pub fn edges(&self) -> impl Iterator<Item=&(usize,usize)> {
+        self.edges.iter()
     }
 }
 
