@@ -8,12 +8,13 @@ use std::iter::Iterator;
 /// Vertices and edges may not be removed.
 pub struct Graph {
     edges: HashSet<(usize, usize)>,
+    vertices: HashSet<usize>,
 }
 
 impl Graph {
     /// Constructs a new graph
     pub fn new() -> Self {
-        Graph { edges: HashSet::new() }
+        Graph { edges: HashSet::new(), vertices: HashSet::new() }
     }
 
     /// Add edge to the graph
@@ -27,6 +28,8 @@ impl Graph {
             v = t;
         }
         self.edges.insert((u,v));
+        self.vertices.insert(u);
+        self.vertices.insert(v);
     }
 
     /// Queries whether an edge exists in the graph.
@@ -44,11 +47,15 @@ impl Graph {
     pub fn edges(&self) -> impl Iterator<Item=&(usize,usize)> {
         self.edges.iter()
     }
+
+    pub fn vertices(&self) -> impl Iterator<Item=&usize> {
+        self.vertices.iter()
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use Graph;
+    use graph::Graph;
 
     #[test]
     fn creation() {
