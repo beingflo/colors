@@ -107,6 +107,14 @@ pub fn lf_coloring(graph: &Graph) -> Coloring {
     c
 }
 
+/// Return a Smallest-Last-coloring of the graph.
+/// This algorithm optimally colors trees, cycles and other types of graphs.
+/// For general graphs there is no guaranteed about the number of colors used.
+pub fn sl_coloring(graph: &Graph) -> Coloring {
+    // TODO
+    Coloring::new()
+}
+
 
 
 #[cfg(test)]
