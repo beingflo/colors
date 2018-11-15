@@ -245,4 +245,45 @@ mod tests {
         assert!(check_coloring(&g, &c));
         assert_eq!(num_colors(&c), 2);
     }
+
+    #[test]
+    fn lf_color2() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+        g.add_edge(1,3);
+
+        let c = lf_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn lf_line() {
+        let mut g = Graph::new();
+
+        for i in 0..10 {
+            g.add_edge(i, i+1);
+        }
+
+        let c = lf_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+
+        // Line might not be 2-colored by lf coloring
+        // in case of unfortunate vertex ordering
+        assert!(num_colors(&c) <= 3);
+    }
+
+    #[test]
+    fn lf_random() {
+        let g = random_graph(100, 0.5);
+
+        let c = lf_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert!(num_colors(&c) <= g.vertices().count());
+        assert!(num_colors(&c) >= 2);
+    }
 }
