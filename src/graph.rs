@@ -40,3 +40,30 @@ impl Graph {
         self.edges.contains(&(u,v))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use Graph;
+
+    #[test]
+    fn creation() {
+        let g = Graph::new();
+        assert!(!g.has_edge(0,1));
+    }
+
+    #[test]
+    fn insertion() {
+        let mut g = Graph::new();
+        g.add_edge(1,2);
+        assert!(g.has_edge(1,2));
+        assert!(!g.has_edge(1,3));
+    }
+
+    #[test]
+    fn insertion_reversed() {
+        let mut g = Graph::new();
+        g.add_edge(1,2);
+        assert!(g.has_edge(2,1));
+        assert!(!g.has_edge(1,3));
+    }
+}
