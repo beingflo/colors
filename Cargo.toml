@@ -5,3 +5,5 @@ authors = ["Florian Marending <floriama@student.ethz.ch>"]
 
 [dependencies]
 rand = "*"
+tui = "*"
+termion = "*"
