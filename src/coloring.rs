@@ -79,6 +79,7 @@ pub fn greedy_coloring<'a>(graph: &'a Graph, vertices: impl Iterator<Item=&'a us
 /// been colored in random order.
 /// There is no guarantee about the number of colors used.
 pub fn rs_coloring(graph: &Graph) -> Coloring {
+    // 'graph.vertices()' returns random order as it's implemented as HashSet
     greedy_coloring(graph, graph.vertices())
 }
 
@@ -86,9 +87,7 @@ pub fn rs_coloring(graph: &Graph) -> Coloring {
 /// the vertices in order of decreasing degree.
 /// There is no guarantee about the number of colors used.
 pub fn lf_coloring(graph: &Graph) -> Coloring {
-    let mut c = Coloring::new();
-    let n = graph.vertices().count();
-
+    // Sequence building stage for this algorithm
     let mut vertices: Vec<(usize, usize)> = graph.vertices().map(|u| (*u, 0)).collect();
 
     for (v, d) in &mut vertices {
@@ -97,24 +96,7 @@ pub fn lf_coloring(graph: &Graph) -> Coloring {
 
     vertices.sort_by(|a,b| b.1.cmp(&a.1));
 
-    for &(v, _) in &vertices {
-        let mut blocked_colors = HashSet::new();
-        for u in graph.neighbors(v) {
-            if let Some(color) = c.get(u) {
-                blocked_colors.insert(*color);
-            }
-        }
-
-
-        for x in 0..n {
-            if !blocked_colors.contains(&x) {
-                c.insert(v, x);
-                break;
-            }
-        }
-    }
-
-    c
+    greedy_coloring(graph, vertices.iter().map(|(v, _)| v))
 }
 
 /// Returns a Smallest-Last-coloring of the graph.
