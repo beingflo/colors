@@ -18,7 +18,7 @@ pub fn compatible_coloring(graph: &Graph, coloring: &Coloring) -> bool {
 }
 
 /// Check whether no adjacent vertices are in conflict.
-/// 'false' indicates either a color conflict or no color define for at least
+/// 'false' indicates either a color conflict or no color defined for at least
 /// one of the vertices in the graph.
 pub fn check_coloring(graph: &Graph, coloring: &Coloring) -> bool {
     if !compatible_coloring(graph, coloring) {
@@ -46,7 +46,7 @@ pub fn num_colors(coloring: &Coloring) -> usize {
 }
 
 
-/// Return a greedy coloring of the graph.
+/// Returns a greedy coloring of the graph.
 /// There is no guaranteed about the number of colors used.
 pub fn greedy_coloring(graph: &Graph) -> Coloring {
     let mut c = Coloring::new();
@@ -72,7 +72,7 @@ pub fn greedy_coloring(graph: &Graph) -> Coloring {
     c
 }
 
-/// Return a Largest-First-coloring of the graph attained by greedily coloring
+/// Returns a Largest-First-coloring of the graph attained by greedily coloring
 /// the vertices in order of decreasing degree.
 /// There is no guaranteed about the number of colors used.
 pub fn lf_coloring(graph: &Graph) -> Coloring {
@@ -107,7 +107,7 @@ pub fn lf_coloring(graph: &Graph) -> Coloring {
     c
 }
 
-/// Return a Smallest-Last-coloring of the graph.
+/// Returns a Smallest-Last-coloring of the graph.
 /// This algorithm optimally colors trees, cycles and other types of graphs.
 /// For general graphs there is no guaranteed about the number of colors used.
 pub fn sl_coloring(graph: &Graph) -> Coloring {
