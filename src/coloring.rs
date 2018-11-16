@@ -45,6 +45,37 @@ pub fn num_colors(coloring: &Coloring) -> usize {
     colors.len()
 }
 
+/// Returns a 2-coloring of the graph if it exists, None otherwise.
+/// Can be used as a check for bipartiteness.
+pub fn two_coloring(graph: &Graph) -> Option<Coloring> {
+    let mut c = Coloring::new();
+
+    for &v in graph.vertices() {
+        let mut color_set = [false, false];
+        for u in graph.neighbors(v) {
+            if let Some(color) = c.get(u) {
+                color_set[*color] = true;
+
+            }
+        }
+
+        // Conflict
+        if color_set[0] && color_set[1] {
+            return None;
+        }
+
+        if color_set[0] {
+            c.insert(v, 1);
+        } else {
+            // color 0 if either there is a color 1 in neighborhood or
+            // there is no color in neighborhood
+            c.insert(v, 0);
+        }
+    }
+
+    Some(c)
+}
+
 /// Greedy coloring algorithm.
 /// Colors the vertices in the sequence provided by chosing the
 /// smallest color not in conflict.
