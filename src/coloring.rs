@@ -47,7 +47,7 @@ pub fn num_colors(coloring: &Coloring) -> usize {
 
 
 /// Returns a greedy coloring of the graph.
-/// There is no guaranteed about the number of colors used.
+/// There is no guarantee about the number of colors used.
 pub fn greedy_coloring(graph: &Graph) -> Coloring {
     let mut c = Coloring::new();
     let n = graph.vertices().count();
@@ -74,7 +74,7 @@ pub fn greedy_coloring(graph: &Graph) -> Coloring {
 
 /// Returns a Largest-First-coloring of the graph attained by greedily coloring
 /// the vertices in order of decreasing degree.
-/// There is no guaranteed about the number of colors used.
+/// There is no guarantee about the number of colors used.
 pub fn lf_coloring(graph: &Graph) -> Coloring {
     let mut c = Coloring::new();
     let n = graph.vertices().count();
@@ -109,7 +109,7 @@ pub fn lf_coloring(graph: &Graph) -> Coloring {
 
 /// Returns a Smallest-Last-coloring of the graph.
 /// This algorithm optimally colors trees, cycles and other types of graphs.
-/// For general graphs there is no guaranteed about the number of colors used.
+/// For general graphs there is no guarantee about the number of colors used.
 pub fn sl_coloring(graph: &Graph) -> Coloring {
     // TODO
     Coloring::new()
