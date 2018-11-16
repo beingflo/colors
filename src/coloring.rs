@@ -45,14 +45,16 @@ pub fn num_colors(coloring: &Coloring) -> usize {
     colors.len()
 }
 
-
-/// Returns a greedy coloring of the graph.
-/// There is no guarantee about the number of colors used.
-pub fn greedy_coloring(graph: &Graph) -> Coloring {
-    let mut c = Coloring::new();
+/// Greedy coloring algorithm.
+/// Colors the vertices in the sequence provided by chosing the
+/// smallest color not in conflict.
+pub fn greedy_coloring<'a>(graph: &'a Graph, vertices: impl Iterator<Item=&'a usize>) -> Coloring {
+    // Must be equal to 'vertices.count()'
+    // as 'vertices' must be permutation of 'graph.vertices'
     let n = graph.vertices().count();
+    let mut c = Coloring::new();
 
-    for &v in graph.vertices() {
+    for &v in vertices {
         let mut blocked_colors = HashSet::new();
         for u in graph.neighbors(v) {
             if let Some(color) = c.get(u) {
@@ -70,6 +72,14 @@ pub fn greedy_coloring(graph: &Graph) -> Coloring {
     }
 
     c
+}
+
+/// Random sequential method.
+/// Returns a greedy coloring of the graph where the vertices have
+/// been colored in random order.
+/// There is no guarantee about the number of colors used.
+pub fn rs_coloring(graph: &Graph) -> Coloring {
+    greedy_coloring(graph, graph.vertices())
 }
 
 /// Returns a Largest-First-coloring of the graph attained by greedily coloring
@@ -171,7 +181,7 @@ pub fn sl_coloring(graph: &Graph) -> Coloring {
 #[cfg(test)]
 mod tests {
     use graph::Graph;
-    use coloring:: { Coloring, check_coloring, compatible_coloring, num_colors, greedy_coloring, lf_coloring, sl_coloring };
+    use coloring:: { Coloring, check_coloring, compatible_coloring, num_colors, rs_coloring, lf_coloring, sl_coloring };
 
     #[test]
     fn creation_empty() {
@@ -241,52 +251,52 @@ mod tests {
     }
 
     #[test]
-    fn greedy_color() {
+    fn rs_color() {
         let mut g = Graph::new();
 
         g.add_edge(1,2);
 
-        let c = greedy_coloring(&g);
+        let c = rs_coloring(&g);
 
         assert!(check_coloring(&g, &c));
         assert_eq!(num_colors(&c), 2);
     }
 
     #[test]
-    fn greedy_color2() {
+    fn rs_color2() {
         let mut g = Graph::new();
 
         g.add_edge(1,2);
         g.add_edge(1,3);
 
-        let c = greedy_coloring(&g);
+        let c = rs_coloring(&g);
 
         assert!(check_coloring(&g, &c));
         assert_eq!(num_colors(&c), 2);
     }
 
     #[test]
-    fn greedy_line() {
+    fn rs_line() {
         let mut g = Graph::new();
 
         for i in 0..10 {
             g.add_edge(i, i+1);
         }
 
-        let c = greedy_coloring(&g);
+        let c = rs_coloring(&g);
 
         assert!(check_coloring(&g, &c));
 
-        // Line might not be 2-colored by greedy
+        // Line might not be 2-colored by rs
         // in case of unfortunate vertex ordering
         assert!(num_colors(&c) <= 3);
     }
 
     #[test]
-    fn greedy_random() {
+    fn rs_random() {
         let g = Graph::random(100, 0.5);
 
-        let c = greedy_coloring(&g);
+        let c = rs_coloring(&g);
 
         assert!(check_coloring(&g, &c));
         assert!(num_colors(&c) <= g.vertices().count());
@@ -408,7 +418,7 @@ mod tests {
             g.add_edge(i, 2*i+2);
         }
 
-        let c = greedy_coloring(&g);
+        let c = rs_coloring(&g);
         let c1 = lf_coloring(&g);
         let c2 = sl_coloring(&g);
 
@@ -431,7 +441,7 @@ mod tests {
             g.add_edge(i, (i+1)%n);
         }
 
-        let c = greedy_coloring(&g);
+        let c = rs_coloring(&g);
         let c1 = lf_coloring(&g);
         let c2 = sl_coloring(&g);
 
