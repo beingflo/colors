@@ -22,8 +22,8 @@ impl Graph {
         Graph { edges: HashSet::new(), vertices: HashSet::new(), neighbors: HashMap::new() }
     }
 
-    /// Constructs a random graph with n vertices where each undirected
-    /// edge has probability p of occuring in the graph.
+    /// Constructs a random graph with ```n``` vertices where each undirected
+    /// edge has probability ```p``` of occuring in the graph.
     pub fn random(n: usize, p: f32) -> Self {
         let mut g = Graph::new();
 
@@ -39,7 +39,7 @@ impl Graph {
     }
 
     /// Adds an edge to the graph.
-    /// add_edge(u,v) has the same effect as add_edge(v,u)
+    /// ```add_edge(u,v)``` has the same effect as ```add_edge(v,u)```
     /// as the graph captures undirected edges.
     /// Adding an edge that already exists has no effect.
     pub fn add_edge(&mut self, mut u: usize, mut v: usize)  {

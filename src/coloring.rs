@@ -17,7 +17,7 @@ pub fn compatible_coloring(graph: &Graph, coloring: &Coloring) -> bool {
 }
 
 /// Check whether no adjacent vertices are in conflict.
-/// 'false' indicates either a color conflict or no color defined for at least
+/// ```false``` indicates either a color conflict or no color defined for at least
 /// one of the vertices in the graph.
 pub fn check_coloring(graph: &Graph, coloring: &Coloring) -> bool {
     if !compatible_coloring(graph, coloring) {
@@ -44,7 +44,7 @@ pub fn num_colors(coloring: &Coloring) -> usize {
     colors.len()
 }
 
-/// Returns a 2-coloring of the graph if it exists, None otherwise.
+/// Returns a 2-coloring of the graph if it exists, ```None``` otherwise.
 /// Can be used as a check for bipartiteness.
 pub fn two_coloring(graph: &Graph) -> Option<Coloring> {
     let mut c = Coloring::new();
