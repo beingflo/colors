@@ -400,24 +400,47 @@ mod tests {
 
     #[test]
     fn tree_coloring() {
-        let mut tree = Graph::new();
+        let mut g = Graph::new();
 
         // Binary tree
         for i in 0..127 {
-            tree.add_edge(i, 2*i+1);
-            tree.add_edge(i, 2*i+2);
+            g.add_edge(i, 2*i+1);
+            g.add_edge(i, 2*i+2);
         }
 
-        let c = greedy_coloring(&tree);
-        let c1 = lf_coloring(&tree);
-        let c2 = sl_coloring(&tree);
+        let c = greedy_coloring(&g);
+        let c1 = lf_coloring(&g);
+        let c2 = sl_coloring(&g);
 
-        assert!(check_coloring(&tree, &c));
-        assert!(check_coloring(&tree, &c1));
-        assert!(check_coloring(&tree, &c2));
+        assert!(check_coloring(&g, &c));
+        assert!(check_coloring(&g, &c1));
+        assert!(check_coloring(&g, &c2));
 
         assert!(num_colors(&c) <= 4);
         assert!(num_colors(&c1) <= 4);
         assert!(num_colors(&c2) == 2);
+    }
+
+    #[test]
+    fn cycle_coloring() {
+        let mut g = Graph::new();
+
+        // cycle
+        let n = 128;
+        for i in 0..n {
+            g.add_edge(i, (i+1)%n);
+        }
+
+        let c = greedy_coloring(&g);
+        let c1 = lf_coloring(&g);
+        let c2 = sl_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert!(check_coloring(&g, &c1));
+        assert!(check_coloring(&g, &c2));
+
+        assert_eq!(num_colors(&c), 3);
+        assert_eq!(num_colors(&c1), 3);
+        assert_eq!(num_colors(&c2), 2);
     }
 }
