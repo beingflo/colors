@@ -103,7 +103,7 @@ pub fn greedy_coloring<'a>(graph: &'a Graph, vertices: impl Iterator<Item=&'a us
     c
 }
 
-/// Returns a greedy coloring of the graph where the vertices have
+/// Returns a random-sequence greedy coloring of the graph where the vertices have
 /// been colored in random order.
 /// There is no guarantee about the number of colors used.
 pub fn rs_coloring(graph: &Graph) -> Coloring {
@@ -111,7 +111,15 @@ pub fn rs_coloring(graph: &Graph) -> Coloring {
     greedy_coloring(graph, graph.vertices())
 }
 
-/// Returns a Largest-First-coloring of the graph attained by greedily coloring
+/// Returns a connected-sequence greedy coloring of the graph where the vertices have
+/// been colored in an order such that each vertex (except the first) has atleast one
+/// neighbor that has already been colored.
+pub fn cs_coloring(graph: &Graph) -> Coloring {
+    // TODO
+    Coloring::new()
+}
+
+/// Returns a largest-first greedy coloring of the graph attained by greedily coloring
 /// the vertices in order of decreasing degree.
 /// There is no guarantee about the number of colors used.
 pub fn lf_coloring(graph: &Graph) -> Coloring {
@@ -127,7 +135,7 @@ pub fn lf_coloring(graph: &Graph) -> Coloring {
     greedy_coloring(graph, vertices.iter().map(|(v, _)| v))
 }
 
-/// Returns a Smallest-Last-coloring of the graph.
+/// Returns a smallest-last greedy coloring of the graph.
 /// This algorithm optimally colors trees, cycles and other types of graphs.
 /// For general graphs there is no guarantee about the number of colors used.
 pub fn sl_coloring(graph: &Graph) -> Coloring {
