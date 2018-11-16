@@ -412,14 +412,17 @@ mod tests {
         let c = rs_coloring(&g);
         let c1 = lf_coloring(&g);
         let c2 = sl_coloring(&g);
+        let c3 = two_coloring(&g).unwrap();
 
         assert!(check_coloring(&g, &c));
         assert!(check_coloring(&g, &c1));
         assert!(check_coloring(&g, &c2));
+        assert!(check_coloring(&g, &c3));
 
         assert!(num_colors(&c) <= 4);
         assert!(num_colors(&c1) <= 4);
         assert!(num_colors(&c2) == 2);
+        assert_eq!(num_colors(&c3), 2);
     }
 
     #[test]
@@ -525,5 +528,18 @@ mod tests {
 
         // Line must be 2-colored by two-coloring
         assert!(num_colors(&c) == 2);
+    }
+
+    #[test]
+    fn two_fail() {
+        let mut g = Graph::new();
+
+        g.add_edge(0, 1);
+        g.add_edge(1, 2);
+        g.add_edge(2, 0);
+
+        let c = two_coloring(&g);
+
+        assert!(c.is_none());
     }
 }
