@@ -1,5 +1,4 @@
-use std::collections::HashMap;
-use std::collections::HashSet;
+use std::collections::{ HashMap, HashSet, VecDeque };
 use graph::Graph;
 
 /// Coloring type.
@@ -49,27 +48,26 @@ pub fn num_colors(coloring: &Coloring) -> usize {
 /// Can be used as a check for bipartiteness.
 pub fn two_coloring(graph: &Graph) -> Option<Coloring> {
     let mut c = Coloring::new();
+    let mut q = VecDeque::new();
 
-    for &v in graph.vertices() {
-        let mut color_set = [false, false];
+    let first = graph.vertices().next().unwrap();
+    q.push_back(first);
+    c.insert(*first, 0);
+
+    while let Some(&v) = q.pop_front() {
+        let &color = c.get(&v).unwrap();
+
         for u in graph.neighbors(v) {
-            if let Some(color) = c.get(u) {
-                color_set[*color] = true;
-
+            if let Some(&col) = c.get(u) {
+                // Conflict
+                if col == color {
+                    return None;
+                }
+            } else {
+                // Color neighbors opposite color and put in the frontier
+                c.insert(*u, 1-color);
+                q.push_back(u);
             }
-        }
-
-        // Conflict
-        if color_set[0] && color_set[1] {
-            return None;
-        }
-
-        if color_set[0] {
-            c.insert(v, 1);
-        } else {
-            // color 0 if either there is a color 1 in neighborhood or
-            // there is no color in neighborhood
-            c.insert(v, 0);
         }
     }
 
@@ -174,7 +172,7 @@ pub fn sl_coloring(graph: &Graph) -> Coloring {
 #[cfg(test)]
 mod tests {
     use graph::Graph;
-    use coloring:: { Coloring, check_coloring, compatible_coloring, num_colors, rs_coloring, lf_coloring, sl_coloring };
+    use coloring:: { Coloring, check_coloring, compatible_coloring, num_colors, rs_coloring, lf_coloring, sl_coloring, two_coloring };
 
     #[test]
     fn creation_empty() {
@@ -477,5 +475,55 @@ mod tests {
         assert!(num_colors(&c) >= 3);
         assert!(num_colors(&c1) >= 3);
         assert!(num_colors(&c2) >= 3);
+    }
+
+    #[test]
+    fn two_color() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+
+        let c = two_coloring(&g);
+
+        assert!(c.is_some());
+        let c = c.unwrap();
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn two_color2() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+        g.add_edge(1,3);
+
+        let c = two_coloring(&g);
+
+        assert!(c.is_some());
+        let c = c.unwrap();
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn two_line() {
+        let mut g = Graph::new();
+
+        for i in 0..10 {
+            g.add_edge(i, i+1);
+        }
+
+        let c = two_coloring(&g);
+
+        assert!(c.is_some());
+        let c = c.unwrap();
+
+        assert!(check_coloring(&g, &c));
+
+        // Line must be 2-colored by two-coloring
+        assert!(num_colors(&c) == 2);
     }
 }
