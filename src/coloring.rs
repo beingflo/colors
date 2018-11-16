@@ -438,14 +438,21 @@ mod tests {
         let c = rs_coloring(&g);
         let c1 = lf_coloring(&g);
         let c2 = sl_coloring(&g);
+        let c3 = two_coloring(&g);
+
+        // Even circle => bipartite => 2-colorable
+        assert!(c3.is_some());
+        let c3 = c3.unwrap();
 
         assert!(check_coloring(&g, &c));
         assert!(check_coloring(&g, &c1));
         assert!(check_coloring(&g, &c2));
+        assert!(check_coloring(&g, &c3));
 
         assert_eq!(num_colors(&c), 3);
         assert_eq!(num_colors(&c1), 3);
         assert_eq!(num_colors(&c2), 2);
+        assert_eq!(num_colors(&c3), 2);
     }
 
     #[test]
