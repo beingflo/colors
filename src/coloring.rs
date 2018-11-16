@@ -119,7 +119,7 @@ pub fn sl_coloring(graph: &Graph) -> Coloring {
 
 #[cfg(test)]
 mod tests {
-    use graph::{ Graph, random_graph };
+    use graph::Graph;
     use coloring:: { Coloring, check_coloring, compatible_coloring, num_colors, greedy_coloring, lf_coloring };
 
     #[test]
@@ -233,7 +233,7 @@ mod tests {
 
     #[test]
     fn greedy_random() {
-        let g = random_graph(100, 0.5);
+        let g = Graph::random(100, 0.5);
 
         let c = greedy_coloring(&g);
 
@@ -286,7 +286,7 @@ mod tests {
 
     #[test]
     fn lf_random() {
-        let g = random_graph(100, 0.5);
+        let g = Graph::random(100, 0.5);
 
         let c = lf_coloring(&g);
 

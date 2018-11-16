@@ -17,12 +17,28 @@ pub struct Graph {
 }
 
 impl Graph {
-    /// Constructs a new graph
+    /// Constructs a new empty graph
     pub fn new() -> Self {
         Graph { edges: HashSet::new(), vertices: HashSet::new(), neighbors: HashMap::new() }
     }
 
-    /// Add edge to the graph
+    /// Constructs a random graph with n vertices where each undirected
+    /// edge has probability p of occuring in the graph.
+    pub fn random(n: usize, p: f32) -> Self {
+        let mut g = Graph::new();
+
+        for u in 0..n {
+            for v in u+1..n {
+                if random::<f32>() < p {
+                    g.add_edge(u,v);
+                }
+            }
+        }
+
+        g
+    }
+
+    /// Adds an edge to the graph.
     /// add_edge(u,v) has the same effect as add_edge(v,u)
     /// as the graph captures undirected edges.
     /// Adding an edge that already exists has no effect.
@@ -98,28 +114,11 @@ impl Graph {
     }
 }
 
-/// Return a random graph with n vertices where each undirected
-/// edge has probability p of occuring in the graph.
-pub fn random_graph(n: usize, p: f32) -> Graph {
-    let mut g = Graph::new();
-
-    for u in 0..n {
-        for v in u+1..n {
-            if random::<f32>() < p {
-                g.add_edge(u,v);
-            }
-        }
-    }
-
-    g
-}
-
 
 
 #[cfg(test)]
 mod tests {
     use graph::Graph;
-    use graph::random_graph;
 
     #[test]
     fn creation() {
@@ -216,7 +215,7 @@ mod tests {
     #[test]
     fn random() {
         // Expected (100*99)/2 * 0.5 = 2475 edges
-        let g = random_graph(100, 0.5);
+        let g = Graph::random(100, 0.5);
 
         let num_edges = g.edges().count();
 
@@ -227,7 +226,7 @@ mod tests {
 
     #[test]
     fn random_full() {
-        let g = random_graph(100, 1.0);
+        let g = Graph::random(100, 1.0);
 
         let num_edges = g.edges().count();
 
@@ -236,7 +235,7 @@ mod tests {
 
     #[test]
     fn random_empty() {
-        let g = random_graph(100, 0.0);
+        let g = Graph::random(100, 0.0);
 
         let num_edges = g.edges().count();
 
