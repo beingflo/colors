@@ -135,27 +135,8 @@ pub fn sl_coloring(graph: &Graph) -> Coloring {
         k_set.insert(min_d_idx);
     }
 
-    let mut c = Coloring::new();
-
     // Greedy coloring with reversed order of k
-    for &v in k.iter().rev() {
-        let mut blocked_colors = HashSet::new();
-        for u in graph.neighbors(v) {
-            if let Some(color) = c.get(u) {
-                blocked_colors.insert(*color);
-            }
-        }
-
-
-        for x in 0..n {
-            if !blocked_colors.contains(&x) {
-                c.insert(v, x);
-                break;
-            }
-        }
-    }
-
-    c
+    greedy_coloring(graph, k.iter().rev())
 }
 
 
