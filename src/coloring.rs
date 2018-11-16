@@ -415,4 +415,36 @@ mod tests {
         assert_eq!(num_colors(&c1), 3);
         assert_eq!(num_colors(&c2), 2);
     }
+
+    #[test]
+    fn prism_coloring() {
+        // Smallest slightly hard to color graph for SL
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+        g.add_edge(1,3);
+        g.add_edge(2,3);
+        g.add_edge(1,4);
+        g.add_edge(2,5);
+        g.add_edge(3,6);
+        g.add_edge(4,5);
+        g.add_edge(4,6);
+        g.add_edge(5,6);
+
+        let c = rs_coloring(&g);
+        let c1 = lf_coloring(&g);
+        let c2 = sl_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert!(check_coloring(&g, &c1));
+        assert!(check_coloring(&g, &c2));
+
+        assert!(num_colors(&c) <= 4);
+        assert!(num_colors(&c1) <= 4);
+        assert!(num_colors(&c2) <= 4);
+
+        assert!(num_colors(&c) >= 3);
+        assert!(num_colors(&c1) >= 3);
+        assert!(num_colors(&c2) >= 3);
+    }
 }
