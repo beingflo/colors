@@ -107,6 +107,7 @@ pub fn greedy_coloring<'a>(graph: &'a Graph, vertices: impl Iterator<Item=&'a us
 /// been colored in random order.
 /// There is no guarantee about the number of colors used.
 pub fn rs_coloring(graph: &Graph) -> Coloring {
+    // No sequence building stage for this algorithm
     // 'graph.vertices()' returns random order as it's implemented as HashSet
     greedy_coloring(graph, graph.vertices())
 }
@@ -115,15 +116,35 @@ pub fn rs_coloring(graph: &Graph) -> Coloring {
 /// been colored in an order such that each vertex (except the first) has atleast one
 /// neighbor that has already been colored.
 pub fn cs_coloring(graph: &Graph) -> Coloring {
-    // TODO
-    Coloring::new()
+    // Sequence building stage
+    let mut visited = HashSet::new();
+    let mut vec: Vec<usize> = Vec::new();
+
+    let n = graph.vertices().count();
+
+    let first = graph.vertices().next().unwrap();
+    visited.insert(first);
+    vec.push(*first);
+
+    for i in 0..n {
+        let v = vec[i];
+
+        for u in graph.neighbors(v) {
+            if !visited.contains(u) {
+                vec.push(*u);
+                visited.insert(u);
+            }
+        }
+    }
+
+    greedy_coloring(graph, vec.iter())
 }
 
 /// Returns a largest-first greedy coloring of the graph attained by greedily coloring
 /// the vertices in order of decreasing degree.
 /// There is no guarantee about the number of colors used.
 pub fn lf_coloring(graph: &Graph) -> Coloring {
-    // Sequence building stage for this algorithm
+    // Sequence building stage
     let mut vertices: Vec<(usize, usize)> = graph.vertices().map(|u| (*u, 0)).collect();
 
     for (v, d) in &mut vertices {
@@ -139,6 +160,7 @@ pub fn lf_coloring(graph: &Graph) -> Coloring {
 /// This algorithm optimally colors trees, cycles and other types of graphs.
 /// For general graphs there is no guarantee about the number of colors used.
 pub fn sl_coloring(graph: &Graph) -> Coloring {
+    // Sequence building stage
     // Inefficient implementation
     let mut k = Vec::new();
     let mut k_set = HashSet::new();
@@ -180,7 +202,9 @@ pub fn sl_coloring(graph: &Graph) -> Coloring {
 #[cfg(test)]
 mod tests {
     use graph::Graph;
-    use coloring:: { Coloring, check_coloring, compatible_coloring, num_colors, rs_coloring, lf_coloring, sl_coloring, two_coloring };
+    use coloring::{ Coloring, check_coloring, compatible_coloring,
+                    num_colors, rs_coloring, lf_coloring, sl_coloring,
+                    two_coloring, cs_coloring };
 
     #[test]
     fn creation_empty() {
@@ -421,23 +445,26 @@ mod tests {
         let c1 = lf_coloring(&g);
         let c2 = sl_coloring(&g);
         let c3 = two_coloring(&g).unwrap();
+        let c4 = cs_coloring(&g);
 
         assert!(check_coloring(&g, &c));
         assert!(check_coloring(&g, &c1));
         assert!(check_coloring(&g, &c2));
         assert!(check_coloring(&g, &c3));
+        assert!(check_coloring(&g, &c4));
 
         assert!(num_colors(&c) <= 4);
         assert!(num_colors(&c1) <= 4);
         assert!(num_colors(&c2) == 2);
         assert_eq!(num_colors(&c3), 2);
+        assert_eq!(num_colors(&c4), 2);
     }
 
     #[test]
-    fn cycle_coloring() {
+    fn even_cycle_coloring() {
         let mut g = Graph::new();
 
-        // cycle
+        // even cycle
         let n = 128;
         for i in 0..n {
             g.add_edge(i, (i+1)%n);
@@ -447,6 +474,7 @@ mod tests {
         let c1 = lf_coloring(&g);
         let c2 = sl_coloring(&g);
         let c3 = two_coloring(&g);
+        let c4 = cs_coloring(&g);
 
         // Even circle => bipartite => 2-colorable
         assert!(c3.is_some());
@@ -456,11 +484,43 @@ mod tests {
         assert!(check_coloring(&g, &c1));
         assert!(check_coloring(&g, &c2));
         assert!(check_coloring(&g, &c3));
+        assert!(check_coloring(&g, &c4));
 
         assert_eq!(num_colors(&c), 3);
         assert_eq!(num_colors(&c1), 3);
         assert_eq!(num_colors(&c2), 2);
         assert_eq!(num_colors(&c3), 2);
+        assert_eq!(num_colors(&c4), 2);
+    }
+
+    #[test]
+    fn odd_cycle_coloring() {
+        let mut g = Graph::new();
+
+        // odd cycle
+        let n = 127;
+        for i in 0..n {
+            g.add_edge(i, (i+1)%n);
+        }
+
+        let c = rs_coloring(&g);
+        let c1 = lf_coloring(&g);
+        let c2 = sl_coloring(&g);
+        let c3 = two_coloring(&g);
+        let c4 = cs_coloring(&g);
+
+        // Odd circle => not bipartite => not 2-colorable
+        assert!(c3.is_none());
+
+        assert!(check_coloring(&g, &c));
+        assert!(check_coloring(&g, &c1));
+        assert!(check_coloring(&g, &c2));
+        assert!(check_coloring(&g, &c4));
+
+        assert_eq!(num_colors(&c), 3);
+        assert_eq!(num_colors(&c1), 3);
+        assert_eq!(num_colors(&c2), 3);
+        assert_eq!(num_colors(&c4), 3);
     }
 
     #[test]
@@ -556,5 +616,46 @@ mod tests {
         let c = two_coloring(&g);
 
         assert!(c.is_none());
+    }
+
+    #[test]
+    fn cs_color() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+
+        let c = cs_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn cs_color2() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+        g.add_edge(1,3);
+
+        let c = cs_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn cs_line() {
+        let mut g = Graph::new();
+
+        for i in 0..10 {
+            g.add_edge(i, i+1);
+        }
+
+        let c = cs_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+
+        // Line must be 2-colored by cs-coloring
+        assert!(num_colors(&c) == 2);
     }
 }
