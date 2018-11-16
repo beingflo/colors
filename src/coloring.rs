@@ -111,8 +111,55 @@ pub fn lf_coloring(graph: &Graph) -> Coloring {
 /// This algorithm optimally colors trees, cycles and other types of graphs.
 /// For general graphs there is no guarantee about the number of colors used.
 pub fn sl_coloring(graph: &Graph) -> Coloring {
-    // TODO
-    Coloring::new()
+    let mut k = Vec::new();
+    let n = graph.vertices().count();
+
+    while k.len() < n {
+        let mut min_d = std::usize::MAX;
+        let mut min_d_idx = 0;
+        for &v in graph.vertices() {
+            // Only look at vertices not in k
+            if k.iter().any(|&x| x == v) {
+                continue;
+            }
+
+            // Look for min degree of vertices not in k
+            let mut degree = 0;
+            for &u in graph.neighbors(v) {
+                if !k.iter().any(|&x| x == u) {
+                    degree += 1;
+                }
+            }
+            if degree < min_d {
+                min_d = degree;
+                min_d_idx = v;
+            }
+        }
+
+        k.push(min_d_idx);
+    }
+
+    let mut c = Coloring::new();
+
+    // Greedy coloring with reversed order of k
+    for &v in k.iter().rev() {
+        let mut blocked_colors = HashSet::new();
+        for u in graph.neighbors(v) {
+            if let Some(color) = c.get(u) {
+                blocked_colors.insert(*color);
+            }
+        }
+
+
+        for x in 0..n {
+            if !blocked_colors.contains(&x) {
+                c.insert(v, x);
+                break;
+            }
+        }
+    }
+
+    c
 }
 
 
@@ -120,7 +167,7 @@ pub fn sl_coloring(graph: &Graph) -> Coloring {
 #[cfg(test)]
 mod tests {
     use graph::Graph;
-    use coloring:: { Coloring, check_coloring, compatible_coloring, num_colors, greedy_coloring, lf_coloring };
+    use coloring:: { Coloring, check_coloring, compatible_coloring, num_colors, greedy_coloring, lf_coloring, sl_coloring };
 
     #[test]
     fn creation_empty() {
@@ -289,6 +336,58 @@ mod tests {
         let g = Graph::random(100, 0.5);
 
         let c = lf_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert!(num_colors(&c) <= g.vertices().count());
+        assert!(num_colors(&c) >= 2);
+    }
+
+    #[test]
+    fn sl_color() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+
+        let c = sl_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn sl_color2() {
+        let mut g = Graph::new();
+
+        g.add_edge(1,2);
+        g.add_edge(1,3);
+
+        let c = sl_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn sl_line() {
+        let mut g = Graph::new();
+
+        for i in 0..10 {
+            g.add_edge(i, i+1);
+        }
+
+        let c = sl_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+
+        // Line must be 2-colored by sl-coloring
+        assert!(num_colors(&c) == 2);
+    }
+
+    #[test]
+    fn sl_random() {
+        let g = Graph::random(100, 0.5);
+
+        let c = sl_coloring(&g);
 
         assert!(check_coloring(&g, &c));
         assert!(num_colors(&c) <= g.vertices().count());
