@@ -111,7 +111,10 @@ pub fn lf_coloring(graph: &Graph) -> Coloring {
 /// This algorithm optimally colors trees, cycles and other types of graphs.
 /// For general graphs there is no guarantee about the number of colors used.
 pub fn sl_coloring(graph: &Graph) -> Coloring {
+    // Inefficient implementation
     let mut k = Vec::new();
+    let mut k_set = HashSet::new();
+
     let n = graph.vertices().count();
 
     while k.len() < n {
@@ -119,14 +122,14 @@ pub fn sl_coloring(graph: &Graph) -> Coloring {
         let mut min_d_idx = 0;
         for &v in graph.vertices() {
             // Only look at vertices not in k
-            if k.iter().any(|&x| x == v) {
+            if k_set.contains(&v) {
                 continue;
             }
 
             // Look for min degree of vertices not in k
             let mut degree = 0;
             for &u in graph.neighbors(v) {
-                if !k.iter().any(|&x| x == u) {
+                if !k_set.contains(&u) {
                     degree += 1;
                 }
             }
@@ -137,6 +140,7 @@ pub fn sl_coloring(graph: &Graph) -> Coloring {
         }
 
         k.push(min_d_idx);
+        k_set.insert(min_d_idx);
     }
 
     let mut c = Coloring::new();
