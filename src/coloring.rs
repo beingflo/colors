@@ -74,7 +74,6 @@ pub fn greedy_coloring<'a>(graph: &'a Graph, vertices: impl Iterator<Item=&'a us
     c
 }
 
-/// Random sequential method.
 /// Returns a greedy coloring of the graph where the vertices have
 /// been colored in random order.
 /// There is no guarantee about the number of colors used.
