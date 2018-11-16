@@ -393,4 +393,27 @@ mod tests {
         assert!(num_colors(&c) <= g.vertices().count());
         assert!(num_colors(&c) >= 2);
     }
+
+    #[test]
+    fn tree_coloring() {
+        let mut tree = Graph::new();
+
+        // Binary tree
+        for i in 0..127 {
+            tree.add_edge(i, 2*i+1);
+            tree.add_edge(i, 2*i+2);
+        }
+
+        let c = greedy_coloring(&tree);
+        let c1 = lf_coloring(&tree);
+        let c2 = sl_coloring(&tree);
+
+        assert!(check_coloring(&tree, &c));
+        assert!(check_coloring(&tree, &c1));
+        assert!(check_coloring(&tree, &c2));
+
+        assert!(num_colors(&c) <= 4);
+        assert!(num_colors(&c1) <= 4);
+        assert!(num_colors(&c2) == 2);
+    }
 }
