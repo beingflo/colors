@@ -223,4 +223,20 @@ mod tests {
 
         assert_eq!(edges1, edges2);
     }
+
+    #[test]
+    fn complete() {
+        let n = 50;
+        let g = AdjMatrix::complete(n);
+
+        assert_eq!(g.edges().count(), n * (n-1) / 2);
+    }
+
+    #[test]
+    fn complete_large() {
+        let n = 500;
+        let g = AdjMatrix::complete(n);
+
+        assert_eq!(g.edges().count(), n * (n-1) / 2);
+    }
 }

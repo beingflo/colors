@@ -47,6 +47,18 @@ pub trait Graph: Sized {
         g
     }
 
+    /// Constructs a complete graph of size ```n```.
+    /// Every combination of vertices is connected by an edge.
+    fn complete(n: usize) -> Self {
+        let mut g = Self::with_capacity(n);
+        for u in 0..n {
+            for v in (u+1)..n {
+                g.add_edge(u,v);
+            }
+        }
+        g
+    }
+
     /// Returns the maximum degree of any node in the graph.
     /// That is the maximal number of neighbors any vertex has.
     fn max_degree(&self) -> usize {
