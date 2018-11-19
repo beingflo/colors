@@ -4,6 +4,11 @@ use itertools::Itertools;
 
 use rand::random;
 
+/// Graph datastructure implemented as an adjacency matrix.
+/// The graph is undirected and unweighted - only the connectivity pattern of
+/// the vertices is captured. Multiple edges and self edges are also disallowed.
+///
+/// Vertices and edges may not be removed.
 pub struct AdjMatrix {
     adj: Vec<bool>,
     vertices: HashSet<usize>,
@@ -11,10 +16,13 @@ pub struct AdjMatrix {
 }
 
 impl AdjMatrix {
+    /// Constructs a new graph with capacity for ```n``` vertices and arbitrary edges.
     pub fn with_capacity(n: usize) -> Self {
         Self { adj: vec![false; n*n], vertices: HashSet::new(), n: n }
     }
 
+    /// Constructs a random graph with ```n``` vertices where each undirected
+    /// edge has probability ```p``` of occuring in the graph.
     pub fn random(n: usize, p: f32) -> Self {
         let mut g = AdjMatrix::with_capacity(n);
 
@@ -29,6 +37,10 @@ impl AdjMatrix {
         g
     }
 
+    /// Adds an edge to the graph.
+    /// ```add_edge(u,v)``` has the same effect as ```add_edge(v,u)```
+    /// as the graph captures undirected edges.
+    /// Adding an edge that already exists has no effect.
     pub fn add_edge(&mut self, u: usize, v: usize)  {
         // Self edges explicitly disallowed
         if u == v {
@@ -44,11 +56,13 @@ impl AdjMatrix {
         self.vertices.insert(v);
     }
 
+    /// Queries whether an edge exists in the graph.
     pub fn has_edge(&self, u: usize, v: usize) -> bool {
         let idx = self.get_idx(u, v);
         self.adj[idx]
     }
 
+    /// Returns an itertator over all the edges in the graph.
     pub fn edges(&self) -> impl Iterator<Item=(usize,usize)> + '_ {
         let n = self.n;
         self.adj.iter().enumerate().filter(|(_, &b)| b).map(move |(i, _)| {
@@ -59,14 +73,18 @@ impl AdjMatrix {
         }).unique()
     }
 
+    /// Returns an iterator over all the vertices in the graph.
     pub fn vertices(&self) -> impl Iterator<Item=usize> + '_ {
         self.vertices.iter().cloned()
     }
 
+    /// Returns an iterator over all the neighboring vertices in the graph.
     pub fn neighbors(&self, v: usize) -> impl Iterator<Item=usize> + '_ {
         self.adj[(v * self.n)..(((v+1) * self.n) - 1)].iter().enumerate().filter(|(_, &b)| b).map(|(i, _)| i)
     }
 
+    /// Returns the maximum degree of any node in the graph.
+    /// That is the maximal number of neighbors any vertex has.
     pub fn max_degree(&self) -> usize {
         let mut max = 0;
         for u in self.vertices() {
