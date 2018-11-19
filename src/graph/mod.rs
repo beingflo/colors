@@ -22,7 +22,7 @@ pub trait Graph: Sized {
     /// Adding an edge that already exists has no effect.
     fn add_edge(&mut self, usize, usize);
 
-    /// Returns an itertator over all the edges in the graph.
+    /// Returns an iterator over all the edges in the graph.
     fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a>;
 
     /// Returns an iterator over all the vertices in the graph.
