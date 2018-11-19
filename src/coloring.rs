@@ -310,6 +310,7 @@ mod tests {
         // Line might not be 2-colored by rs
         // in case of unfortunate vertex ordering
         assert!(num_colors(&c) <= 3);
+        assert!(num_colors(&c) <= g.max_degree() + 1);
     }
 
     #[test]
@@ -321,6 +322,7 @@ mod tests {
         assert!(check_coloring(&g, &c));
         assert!(num_colors(&c) <= g.vertices().count());
         assert!(num_colors(&c) >= 2);
+        assert!(num_colors(&c) <= g.max_degree() + 1);
     }
 
     #[test]
@@ -363,6 +365,7 @@ mod tests {
         // Line might not be 2-colored by lf coloring
         // in case of unfortunate vertex ordering
         assert!(num_colors(&c) <= 3);
+        assert!(num_colors(&c) <= g.max_degree() + 1);
     }
 
     #[test]
@@ -374,6 +377,7 @@ mod tests {
         assert!(check_coloring(&g, &c));
         assert!(num_colors(&c) <= g.vertices().count());
         assert!(num_colors(&c) >= 2);
+        assert!(num_colors(&c) <= g.max_degree() + 1);
     }
 
     #[test]
@@ -426,6 +430,7 @@ mod tests {
         assert!(check_coloring(&g, &c));
         assert!(num_colors(&c) <= g.vertices().count());
         assert!(num_colors(&c) >= 2);
+        assert!(num_colors(&c) <= g.max_degree() + 1);
     }
 
     #[test]
