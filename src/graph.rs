@@ -9,23 +9,23 @@ use rand::random;
 /// the vertices is captured. Multiple edges and self edges are also disallowed.
 ///
 /// Vertices and edges may not be removed.
-pub struct Graph {
+pub struct EdgeList {
     edges: HashSet<(usize, usize)>,
     vertices: HashSet<usize>,
 
     neighbors: HashMap<usize, HashSet<usize>>,
 }
 
-impl Graph {
+impl EdgeList {
     /// Constructs a new empty graph
     pub fn new() -> Self {
-        Graph { edges: HashSet::new(), vertices: HashSet::new(), neighbors: HashMap::new() }
+        Self { edges: HashSet::new(), vertices: HashSet::new(), neighbors: HashMap::new() }
     }
 
     /// Constructs a random graph with ```n``` vertices where each undirected
     /// edge has probability ```p``` of occuring in the graph.
     pub fn random(n: usize, p: f32) -> Self {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         for u in 0..n {
             for v in u+1..n {
@@ -122,14 +122,14 @@ mod tests {
 
     #[test]
     fn creation() {
-        let g = Graph::new();
+        let g = EdgeList::new();
 
         assert!(!g.has_edge(0,1));
     }
 
     #[test]
     fn insertion() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
         g.add_edge(1,2);
 
         assert!(g.has_edge(1,2));
@@ -138,7 +138,7 @@ mod tests {
 
     #[test]
     fn insertion_reversed() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
         g.add_edge(1,2);
 
         assert!(g.has_edge(2,1));
@@ -147,7 +147,7 @@ mod tests {
 
     #[test]
     fn insertion_large() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         for u in 0..100 {
             for v in u..100 {
@@ -160,7 +160,7 @@ mod tests {
 
     #[test]
     fn edges() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
         g.add_edge(1,2);
         g.add_edge(1,3);
 
@@ -171,7 +171,7 @@ mod tests {
 
     #[test]
     fn neighbors() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
         g.add_edge(1,3);
@@ -187,7 +187,7 @@ mod tests {
 
     #[test]
     fn neighbors_empty() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
         g.add_edge(1,3);
@@ -197,7 +197,7 @@ mod tests {
 
     #[test]
     fn max_degree() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
         g.add_edge(1,3);
@@ -215,7 +215,7 @@ mod tests {
     #[test]
     fn random() {
         // Expected (100*99)/2 * 0.5 = 2475 edges
-        let g = Graph::random(100, 0.5);
+        let g = EdgeList::random(100, 0.5);
 
         let num_edges = g.edges().count();
 
@@ -226,7 +226,7 @@ mod tests {
 
     #[test]
     fn random_full() {
-        let g = Graph::random(100, 1.0);
+        let g = EdgeList::random(100, 1.0);
 
         let num_edges = g.edges().count();
 
@@ -235,7 +235,7 @@ mod tests {
 
     #[test]
     fn random_empty() {
-        let g = Graph::random(100, 0.0);
+        let g = EdgeList::random(100, 0.0);
 
         let num_edges = g.edges().count();
 

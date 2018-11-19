@@ -12,7 +12,7 @@ fn main() {
 
     println!("rs\tcs\tlf\tsl");
     for _ in 0..n {
-        let g = Graph::random(200, 0.9);
+        let g = EdgeList::random(200, 0.9);
 
         let c1 = rs_coloring(&g);
         let c2 = cs_coloring(&g);

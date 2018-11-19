@@ -1,12 +1,12 @@
 use std::collections::{ HashMap, HashSet, VecDeque };
-use graph::Graph;
+use graph::EdgeList;
 
 /// Coloring type.
 /// This maps from vertices to colors.
 pub type Coloring = HashMap<usize, usize>;
 
 /// Check whether coloring defines a color for all vertices that exist in the graph.
-pub fn compatible_coloring(graph: &Graph, coloring: &Coloring) -> bool {
+pub fn compatible_coloring(graph: &EdgeList, coloring: &Coloring) -> bool {
     for u in graph.vertices() {
         if !coloring.contains_key(u) {
             return false;
@@ -19,7 +19,7 @@ pub fn compatible_coloring(graph: &Graph, coloring: &Coloring) -> bool {
 /// Check whether no adjacent vertices are in conflict.
 /// ```false``` indicates either a color conflict or no color defined for at least
 /// one of the vertices in the graph.
-pub fn check_coloring(graph: &Graph, coloring: &Coloring) -> bool {
+pub fn check_coloring(graph: &EdgeList, coloring: &Coloring) -> bool {
     if !compatible_coloring(graph, coloring) {
         return false;
     }
@@ -46,7 +46,7 @@ pub fn num_colors(coloring: &Coloring) -> usize {
 
 /// Returns a 2-coloring of the graph if it exists, ```None``` otherwise.
 /// Can be used as a check for bipartiteness.
-pub fn two_coloring(graph: &Graph) -> Option<Coloring> {
+pub fn two_coloring(graph: &EdgeList) -> Option<Coloring> {
     let mut c = Coloring::new();
     let mut q = VecDeque::new();
 
@@ -77,7 +77,7 @@ pub fn two_coloring(graph: &Graph) -> Option<Coloring> {
 /// Greedy coloring algorithm.
 /// Colors the vertices in the sequence provided by chosing the
 /// smallest color not in conflict.
-pub fn greedy_coloring<'a>(graph: &'a Graph, vertices: impl Iterator<Item=&'a usize>) -> Coloring {
+pub fn greedy_coloring<'a>(graph: &'a EdgeList, vertices: impl Iterator<Item=&'a usize>) -> Coloring {
     // Must be equal to 'vertices.count()'
     // as 'vertices' must be permutation of 'graph.vertices'
     let n = graph.vertices().count();
@@ -106,7 +106,7 @@ pub fn greedy_coloring<'a>(graph: &'a Graph, vertices: impl Iterator<Item=&'a us
 /// Returns a random-sequence greedy coloring of the graph where the vertices have
 /// been colored in random order.
 /// There is no guarantee about the number of colors used.
-pub fn rs_coloring(graph: &Graph) -> Coloring {
+pub fn rs_coloring(graph: &EdgeList) -> Coloring {
     // No sequence building stage for this algorithm
     // 'graph.vertices()' returns random order as it's implemented as HashSet
     greedy_coloring(graph, graph.vertices())
@@ -115,7 +115,7 @@ pub fn rs_coloring(graph: &Graph) -> Coloring {
 /// Returns a connected-sequence greedy coloring of the graph where the vertices have
 /// been colored in an order such that each vertex (except the first) has atleast one
 /// neighbor that has already been colored.
-pub fn cs_coloring(graph: &Graph) -> Coloring {
+pub fn cs_coloring(graph: &EdgeList) -> Coloring {
     // Sequence building stage
     let mut visited = HashSet::new();
     let mut vec: Vec<usize> = Vec::new();
@@ -143,7 +143,7 @@ pub fn cs_coloring(graph: &Graph) -> Coloring {
 /// Returns a largest-first greedy coloring of the graph attained by greedily coloring
 /// the vertices in order of decreasing degree.
 /// There is no guarantee about the number of colors used.
-pub fn lf_coloring(graph: &Graph) -> Coloring {
+pub fn lf_coloring(graph: &EdgeList) -> Coloring {
     // Sequence building stage
     let mut vertices: Vec<(usize, usize)> = graph.vertices().map(|u| (*u, 0)).collect();
 
@@ -159,7 +159,7 @@ pub fn lf_coloring(graph: &Graph) -> Coloring {
 /// Returns a smallest-last greedy coloring of the graph.
 /// This algorithm optimally colors trees, cycles and other types of graphs.
 /// For general graphs there is no guarantee about the number of colors used.
-pub fn sl_coloring(graph: &Graph) -> Coloring {
+pub fn sl_coloring(graph: &EdgeList) -> Coloring {
     // Sequence building stage
     // Inefficient implementation
     let mut k = Vec::new();
@@ -205,7 +205,7 @@ mod tests {
 
     #[test]
     fn creation_empty() {
-        let g = Graph::new();
+        let g = EdgeList::new();
         let c = Coloring::new();
 
         assert!(check_coloring(&g, &c));
@@ -213,7 +213,7 @@ mod tests {
 
     #[test]
     fn creation_fail() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
         let c = Coloring::new();
 
         g.add_edge(1,2);
@@ -224,7 +224,7 @@ mod tests {
 
     #[test]
     fn creation_success() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
         let mut c = Coloring::new();
 
         g.add_edge(1,2);
@@ -237,7 +237,7 @@ mod tests {
 
     #[test]
     fn creation_large() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
         let mut c = Coloring::new();
 
         for u in 0..100 {
@@ -272,7 +272,7 @@ mod tests {
 
     #[test]
     fn rs_color() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
 
@@ -284,7 +284,7 @@ mod tests {
 
     #[test]
     fn rs_color2() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
         g.add_edge(1,3);
@@ -297,7 +297,7 @@ mod tests {
 
     #[test]
     fn rs_line() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         for i in 0..10 {
             g.add_edge(i, i+1);
@@ -314,7 +314,7 @@ mod tests {
 
     #[test]
     fn rs_random() {
-        let g = Graph::random(100, 0.5);
+        let g = EdgeList::random(100, 0.5);
 
         let c = rs_coloring(&g);
 
@@ -325,7 +325,7 @@ mod tests {
 
     #[test]
     fn lf_color() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
 
@@ -337,7 +337,7 @@ mod tests {
 
     #[test]
     fn lf_color2() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
         g.add_edge(1,3);
@@ -350,7 +350,7 @@ mod tests {
 
     #[test]
     fn lf_line() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         for i in 0..10 {
             g.add_edge(i, i+1);
@@ -367,7 +367,7 @@ mod tests {
 
     #[test]
     fn lf_random() {
-        let g = Graph::random(100, 0.5);
+        let g = EdgeList::random(100, 0.5);
 
         let c = lf_coloring(&g);
 
@@ -378,7 +378,7 @@ mod tests {
 
     #[test]
     fn sl_color() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
 
@@ -390,7 +390,7 @@ mod tests {
 
     #[test]
     fn sl_color2() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
         g.add_edge(1,3);
@@ -403,7 +403,7 @@ mod tests {
 
     #[test]
     fn sl_line() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         for i in 0..10 {
             g.add_edge(i, i+1);
@@ -419,7 +419,7 @@ mod tests {
 
     #[test]
     fn sl_random() {
-        let g = Graph::random(100, 0.5);
+        let g = EdgeList::random(100, 0.5);
 
         let c = sl_coloring(&g);
 
@@ -430,7 +430,7 @@ mod tests {
 
     #[test]
     fn tree_coloring() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         // Binary tree
         for i in 0..127 {
@@ -459,7 +459,7 @@ mod tests {
 
     #[test]
     fn even_cycle_coloring() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         // even cycle
         let n = 128;
@@ -492,7 +492,7 @@ mod tests {
 
     #[test]
     fn odd_cycle_coloring() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         // odd cycle
         let n = 127;
@@ -523,7 +523,7 @@ mod tests {
     #[test]
     fn prism_coloring() {
         // Smallest slightly hard to color graph for SL
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
         g.add_edge(1,3);
@@ -554,7 +554,7 @@ mod tests {
 
     #[test]
     fn two_color() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
 
@@ -569,7 +569,7 @@ mod tests {
 
     #[test]
     fn two_color2() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
         g.add_edge(1,3);
@@ -585,7 +585,7 @@ mod tests {
 
     #[test]
     fn two_line() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         for i in 0..10 {
             g.add_edge(i, i+1);
@@ -604,7 +604,7 @@ mod tests {
 
     #[test]
     fn two_fail() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(0, 1);
         g.add_edge(1, 2);
@@ -617,7 +617,7 @@ mod tests {
 
     #[test]
     fn cs_color() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
 
@@ -629,7 +629,7 @@ mod tests {
 
     #[test]
     fn cs_color2() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         g.add_edge(1,2);
         g.add_edge(1,3);
@@ -642,7 +642,7 @@ mod tests {
 
     #[test]
     fn cs_line() {
-        let mut g = Graph::new();
+        let mut g = EdgeList::new();
 
         for i in 0..10 {
             g.add_edge(i, i+1);
