@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::iter::Iterator;
 
 use rand::random;
+use graph::Graph;
 
 /// Graph datastructure implemented as a set of edges.
 /// The graph is undirected and unweighted - only the connectivity pattern of
@@ -71,36 +72,6 @@ impl EdgeList {
         self.neighbors.get_mut(&v).unwrap().insert(u);
     }
 
-    /// Queries whether an edge exists in the graph.
-    pub fn has_edge(&self, mut u: usize, mut v: usize) -> bool {
-        if u > v {
-            let t = u;
-            u = v;
-            v = t;
-        }
-
-        self.edges.contains(&(u,v))
-    }
-
-    /// Returns an itertator over all the edges in the graph.
-    pub fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a> {
-        Box::new(self.edges.iter().cloned())
-    }
-
-    /// Returns an iterator over all the vertices in the graph.
-    pub fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
-        Box::new(self.vertices.iter().cloned())
-    }
-
-    /// Returns an iterator over all the neighboring vertices in the graph.
-    pub fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
-        if let Some(set) = self.neighbors.get(&v) {
-            Box::new(set.iter().cloned())
-        } else {
-            Box::new(std::iter::empty())
-        }
-    }
-
     /// Returns the maximum degree of any node in the graph.
     /// That is the maximal number of neighbors any vertex has.
     pub fn max_degree(&self) -> usize {
@@ -110,6 +81,38 @@ impl EdgeList {
         }
 
         max
+    }
+}
+
+impl Graph for EdgeList {
+    /// Queries whether an edge exists in the graph.
+    fn has_edge(&self, mut u: usize, mut v: usize) -> bool {
+        if u > v {
+            let t = u;
+            u = v;
+            v = t;
+        }
+
+        self.edges.contains(&(u,v))
+    }
+
+    /// Returns an iterator over all the edges in the graph.
+    fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a> {
+        Box::new(self.edges.iter().cloned())
+    }
+
+    /// Returns an iterator over all the vertices in the graph.
+    fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
+        Box::new(self.vertices.iter().cloned())
+    }
+
+    /// Returns an iterator over all the neighboring vertices in the graph.
+    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
+        if let Some(set) = self.neighbors.get(&v) {
+            Box::new(set.iter().cloned())
+        } else {
+            Box::new(std::iter::empty())
+        }
     }
 }
 

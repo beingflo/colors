@@ -3,6 +3,7 @@ use std::iter::Iterator;
 use itertools::Itertools;
 
 use rand::random;
+use graph::Graph;
 
 /// Graph datastructure implemented as an adjacency matrix.
 /// The graph is undirected and unweighted - only the connectivity pattern of
@@ -56,33 +57,6 @@ impl AdjMatrix {
         self.vertices.insert(v);
     }
 
-    /// Queries whether an edge exists in the graph.
-    pub fn has_edge(&self, u: usize, v: usize) -> bool {
-        let idx = self.get_idx(u, v);
-        self.adj[idx]
-    }
-
-    /// Returns an itertator over all the edges in the graph.
-    pub fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a> {
-        let n = self.n;
-        Box::new(self.adj.iter().enumerate().filter(|(_, &b)| b).map(move |(i, _)| {
-            let u = i / n;
-            let v = i % n;
-
-            if u > v { (v,u) } else { (u,v) }
-        }).unique())
-    }
-
-    /// Returns an iterator over all the vertices in the graph.
-    pub fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
-        Box::new(self.vertices.iter().cloned())
-    }
-
-    /// Returns an iterator over all the neighboring vertices in the graph.
-    pub fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
-        Box::new(self.adj[(v * self.n)..(((v+1) * self.n) - 1)].iter().enumerate().filter(|(_, &b)| b).map(|(i, _)| i))
-    }
-
     /// Returns the maximum degree of any node in the graph.
     /// That is the maximal number of neighbors any vertex has.
     pub fn max_degree(&self) -> usize {
@@ -97,6 +71,35 @@ impl AdjMatrix {
     /// Get index into adjacency array from edge.
     fn get_idx(&self, u: usize, v: usize) -> usize {
         v * self.n + u
+    }
+}
+
+impl Graph for AdjMatrix {
+    /// Queries whether an edge exists in the graph.
+    fn has_edge(&self, u: usize, v: usize) -> bool {
+        let idx = self.get_idx(u, v);
+        self.adj[idx]
+    }
+
+    /// Returns an iterator over all the edges in the graph.
+    fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a> {
+        let n = self.n;
+        Box::new(self.adj.iter().enumerate().filter(|(_, &b)| b).map(move |(i, _)| {
+            let u = i / n;
+            let v = i % n;
+
+            if u > v { (v,u) } else { (u,v) }
+        }).unique())
+    }
+
+    /// Returns an iterator over all the vertices in the graph.
+    fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
+        Box::new(self.vertices.iter().cloned())
+    }
+
+    /// Returns an iterator over all the neighboring vertices in the graph.
+    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
+        Box::new(self.adj[(v * self.n)..((v+1) * self.n)].iter().enumerate().filter(|(_, &b)| b).map(|(i, _)| i))
     }
 }
 
