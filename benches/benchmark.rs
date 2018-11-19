@@ -9,6 +9,7 @@ use graml::graph::EdgeList;
 use graml::graph::AdjMatrix;
 
 use graml::coloring::*;
+use graml::graph::Graph;
 
 fn edgelist_creation(n: usize) {
     let g = EdgeList::random(n, 0.5);
