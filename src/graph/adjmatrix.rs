@@ -60,7 +60,7 @@ impl AdjMatrix {
     }
 
     pub fn vertices(&self) -> impl Iterator<Item=usize> + '_ {
-        self.vertices.iter().map(|&x| x)
+        self.vertices.iter().cloned()
     }
 
     pub fn neighbors(&self, v: usize) -> impl Iterator<Item=usize> + '_ {

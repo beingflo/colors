@@ -84,19 +84,19 @@ impl EdgeList {
 
     /// Returns an itertator over all the edges in the graph.
     pub fn edges(&self) -> impl Iterator<Item=(usize,usize)> + '_ {
-        self.edges.iter().map(|&(u,v)| (u,v))
+        self.edges.iter().cloned()
     }
 
     /// Returns an iterator over all the vertices in the graph.
     pub fn vertices(&self) -> impl Iterator<Item=usize> + '_ {
-        self.vertices.iter().map(|&u| u)
+        self.vertices.iter().cloned()
     }
 
     /// Returns an iterator over all the neighboring vertices in the graph.
     pub fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
         // We need to box the return type because the branches don't have the same type
         if self.neighbors.contains_key(&v) {
-            Box::new(self.neighbors[&v].iter().map(|&u| u))
+            Box::new(self.neighbors[&v].iter().cloned())
         } else {
             Box::new(std::iter::empty())
         }
