@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::collections::hash_set::Iter;
 use std::collections::HashMap;
 use std::iter::Iterator;
 
@@ -93,13 +94,15 @@ impl EdgeList {
     }
 
     /// Returns an iterator over all the neighboring vertices in the graph.
-    pub fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
-        // We need to box the return type because the branches don't have the same type
-        if self.neighbors.contains_key(&v) {
-            Box::new(self.neighbors[&v].iter().cloned())
+    pub fn neighbors(&self, v: usize) -> impl Iterator<Item=usize> + '_ {
+        let iter;
+        if let Some(set) = self.neighbors.get(&v) {
+            iter = Some(set.iter());
         } else {
-            Box::new(std::iter::empty())
+            iter = None;
         }
+
+        ELNeighborIterator { iter: iter }
     }
 
     /// Returns the maximum degree of any node in the graph.
@@ -111,6 +114,22 @@ impl EdgeList {
         }
 
         max
+    }
+}
+
+struct ELNeighborIterator<'a> {
+    iter: Option<Iter<'a, usize>>,
+}
+
+impl<'a> Iterator for ELNeighborIterator<'a> {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(ref mut iter) = self.iter {
+            iter.next().cloned()
+        } else {
+            None
+        }
     }
 }
 
