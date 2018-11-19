@@ -2,7 +2,6 @@ use std::collections::HashSet;
 use std::collections::HashMap;
 use std::iter::Iterator;
 
-use rand::random;
 use graph::Graph;
 
 /// Graph datastructure implemented as a set of edges.
@@ -21,22 +20,6 @@ impl EdgeList {
     /// Constructs a new empty graph
     pub fn new() -> Self {
         Self { edges: HashSet::new(), vertices: HashSet::new(), neighbors: HashMap::new() }
-    }
-
-    /// Constructs a random graph with ```n``` vertices where each undirected
-    /// edge has probability ```p``` of occuring in the graph.
-    pub fn random(n: usize, p: f32) -> Self {
-        let mut g = EdgeList::new();
-
-        for u in 0..n {
-            for v in u+1..n {
-                if random::<f32>() < p {
-                    g.add_edge(u,v);
-                }
-            }
-        }
-
-        g
     }
 }
 

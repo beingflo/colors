@@ -1,10 +1,12 @@
 mod edgelist;
 mod adjmatrix;
 
+use rand::random;
+
 pub use self::edgelist::EdgeList;
 pub use self::adjmatrix::AdjMatrix;
 
-pub trait Graph {
+pub trait Graph: Sized {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(n: usize) -> Self;
 
@@ -28,6 +30,22 @@ pub trait Graph {
 
     /// Returns an iterator over all the neighboring vertices in the graph.
     fn neighbors<'a>(&'a self, usize) -> Box<Iterator<Item=usize> + 'a>;
+
+    /// Constructs a random graph with ```n``` vertices where each undirected
+    /// edge has probability ```p``` of occuring in the graph.
+    fn random(n: usize, p: f32) -> Self {
+        let mut g = Self::with_capacity(n);
+
+        for u in 0..n {
+            for v in u+1..n {
+                if random::<f32>() < p {
+                    g.add_edge(u,v);
+                }
+            }
+        }
+
+        g
+    }
 
     /// Returns the maximum degree of any node in the graph.
     /// That is the maximal number of neighbors any vertex has.

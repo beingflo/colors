@@ -2,7 +2,6 @@ use std::collections::HashSet;
 use std::iter::Iterator;
 use itertools::Itertools;
 
-use rand::random;
 use graph::Graph;
 
 /// Graph datastructure implemented as an adjacency matrix.
@@ -17,22 +16,6 @@ pub struct AdjMatrix {
 }
 
 impl AdjMatrix {
-    /// Constructs a random graph with ```n``` vertices where each undirected
-    /// edge has probability ```p``` of occuring in the graph.
-    pub fn random(n: usize, p: f32) -> Self {
-        let mut g = AdjMatrix::with_capacity(n);
-
-        for u in 0..n {
-            for v in u+1..n {
-                if random::<f32>() < p {
-                    g.add_edge(u,v);
-                }
-            }
-        }
-
-        g
-    }
-
     /// Get index into adjacency array from edge.
     fn get_idx(&self, u: usize, v: usize) -> usize {
         v * self.n + u
