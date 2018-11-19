@@ -118,7 +118,7 @@ impl Graph {
 
 #[cfg(test)]
 mod tests {
-    use graph::Graph;
+    use super::*;
 
     #[test]
     fn creation() {

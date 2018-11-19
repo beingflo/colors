@@ -201,10 +201,7 @@ pub fn sl_coloring(graph: &Graph) -> Coloring {
 
 #[cfg(test)]
 mod tests {
-    use graph::Graph;
-    use coloring::{ Coloring, check_coloring, compatible_coloring,
-                    num_colors, rs_coloring, lf_coloring, sl_coloring,
-                    two_coloring, cs_coloring };
+    use super::*;
 
     #[test]
     fn creation_empty() {
