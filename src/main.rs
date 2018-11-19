@@ -1,4 +1,5 @@
 extern crate rand;
+extern crate itertools;
 
 mod graph;
 mod coloring;
