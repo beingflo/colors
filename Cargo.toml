@@ -3,6 +3,14 @@ name = "graml"
 version = "0.1.0"
 authors = ["Florian Marending <floriama@student.ethz.ch>"]
 
+[lib]
+name = "graml"
+path = "src/lib.rs"
+
+[[bin]]
+name = "coloring"
+path = "src/main.rs"
+
 [dependencies]
 rand = "*"
 itertools = "0.7"

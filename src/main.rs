@@ -1,11 +1,7 @@
-extern crate rand;
-extern crate itertools;
+extern crate graml;
 
-mod graph;
-mod coloring;
-
-pub use graph::*;
-pub use coloring::*;
+use graml::graph::*;
+use graml::coloring::*;
 
 fn main() {
     let mut sum = [0; 4];
