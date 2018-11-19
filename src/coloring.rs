@@ -8,7 +8,7 @@ pub type Coloring = HashMap<usize, usize>;
 /// Check whether coloring defines a color for all vertices that exist in the graph.
 pub fn compatible_coloring(graph: &Graph, coloring: &Coloring) -> bool {
     for u in graph.vertices() {
-        if !coloring.contains_key(u) {
+        if !coloring.contains_key(&u) {
             return false;
         }
     }
@@ -25,7 +25,7 @@ pub fn check_coloring(graph: &Graph, coloring: &Coloring) -> bool {
     }
 
     for (u,v) in graph.edges() {
-        if coloring[u] == coloring[v] {
+        if coloring[&u] == coloring[&v] {
             return false;
         }
     }
@@ -52,20 +52,20 @@ pub fn two_coloring(graph: &Graph) -> Option<Coloring> {
 
     let first = graph.vertices().next().unwrap();
     q.push_back(first);
-    c.insert(*first, 0);
+    c.insert(first, 0);
 
-    while let Some(&v) = q.pop_front() {
+    while let Some(v) = q.pop_front() {
         let &color = c.get(&v).unwrap();
 
         for u in graph.neighbors(v) {
-            if let Some(&col) = c.get(u) {
+            if let Some(&col) = c.get(&u) {
                 // Conflict
                 if col == color {
                     return None;
                 }
             } else {
                 // Color neighbors opposite color and put in the frontier
-                c.insert(*u, 1-color);
+                c.insert(u, 1-color);
                 q.push_back(u);
             }
         }
@@ -77,16 +77,16 @@ pub fn two_coloring(graph: &Graph) -> Option<Coloring> {
 /// Greedy coloring algorithm.
 /// Colors the vertices in the sequence provided by chosing the
 /// smallest color not in conflict.
-pub fn greedy_coloring<'a>(graph: &'a Graph, vertices: impl Iterator<Item=&'a usize>) -> Coloring {
+pub fn greedy_coloring(graph: &Graph, vertices: impl Iterator<Item=usize>) -> Coloring {
     // Must be equal to 'vertices.count()'
     // as 'vertices' must be permutation of 'graph.vertices'
     let n = graph.vertices().count();
     let mut c = Coloring::new();
 
-    for &v in vertices {
+    for v in vertices {
         let mut blocked_colors = HashSet::new();
         for u in graph.neighbors(v) {
-            if let Some(color) = c.get(u) {
+            if let Some(color) = c.get(&u) {
                 blocked_colors.insert(*color);
             }
         }
@@ -124,20 +124,20 @@ pub fn cs_coloring(graph: &Graph) -> Coloring {
 
     let first = graph.vertices().next().unwrap();
     visited.insert(first);
-    vec.push(*first);
+    vec.push(first);
 
     for i in 0..n {
         let v = vec[i];
 
         for u in graph.neighbors(v) {
-            if !visited.contains(u) {
-                vec.push(*u);
+            if !visited.contains(&u) {
+                vec.push(u);
                 visited.insert(u);
             }
         }
     }
 
-    greedy_coloring(graph, vec.iter())
+    greedy_coloring(graph, vec.iter().cloned())
 }
 
 /// Returns a largest-first greedy coloring of the graph attained by greedily coloring
@@ -145,7 +145,7 @@ pub fn cs_coloring(graph: &Graph) -> Coloring {
 /// There is no guarantee about the number of colors used.
 pub fn lf_coloring(graph: &Graph) -> Coloring {
     // Sequence building stage
-    let mut vertices: Vec<(usize, usize)> = graph.vertices().map(|u| (*u, 0)).collect();
+    let mut vertices: Vec<(usize, usize)> = graph.vertices().map(|u| (u, 0)).collect();
 
     for (v, d) in &mut vertices {
         *d = graph.neighbors(*v).count();
@@ -153,7 +153,7 @@ pub fn lf_coloring(graph: &Graph) -> Coloring {
 
     vertices.sort_by(|a,b| b.1.cmp(&a.1));
 
-    greedy_coloring(graph, vertices.iter().map(|(v, _)| v))
+    greedy_coloring(graph, vertices.iter().map(|&(v, _)| v))
 }
 
 /// Returns a smallest-last greedy coloring of the graph.
@@ -170,7 +170,7 @@ pub fn sl_coloring(graph: &Graph) -> Coloring {
     while k.len() < n {
         let mut min_d = std::usize::MAX;
         let mut min_d_idx = 0;
-        for &v in graph.vertices() {
+        for v in graph.vertices() {
             // Only look at vertices not in k
             if k_set.contains(&v) {
                 continue;
@@ -178,7 +178,7 @@ pub fn sl_coloring(graph: &Graph) -> Coloring {
 
             // Look for min degree of vertices not in k
             let mut degree = 0;
-            for &u in graph.neighbors(v) {
+            for u in graph.neighbors(v) {
                 if !k_set.contains(&u) {
                     degree += 1;
                 }
@@ -194,7 +194,7 @@ pub fn sl_coloring(graph: &Graph) -> Coloring {
     }
 
     // Greedy coloring with reversed order of k
-    greedy_coloring(graph, k.iter().rev())
+    greedy_coloring(graph, k.iter().rev().cloned())
 }
 
 
