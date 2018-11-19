@@ -71,20 +71,17 @@ impl EdgeList {
 
         self.neighbors.get_mut(&v).unwrap().insert(u);
     }
-
-    /// Returns the maximum degree of any node in the graph.
-    /// That is the maximal number of neighbors any vertex has.
-    pub fn max_degree(&self) -> usize {
-        let mut max = 0;
-        for u in self.vertices() {
-            max = max.max(self.neighbors(u).count());
-        }
-
-        max
-    }
 }
 
 impl Graph for EdgeList {
+    /// Constructs a new graph with capacity for ```n``` vertices.
+    fn with_capacity(n: usize) -> Self {
+        // Only implemented for compatibility, not very useful here
+        let mut g = Self::new();
+        g.vertices.reserve(n);
+        g
+    }
+
     /// Construct an instance of this type from another ```Graph``` implementor
     fn from_graph<G: Graph>(graph: &G) -> Self {
         let mut g = Self::new();

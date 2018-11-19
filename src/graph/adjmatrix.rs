@@ -17,11 +17,6 @@ pub struct AdjMatrix {
 }
 
 impl AdjMatrix {
-    /// Constructs a new graph with capacity for ```n``` vertices and arbitrary edges.
-    pub fn with_capacity(n: usize) -> Self {
-        Self { adj: vec![false; n*n], vertices: HashSet::new(), n: n }
-    }
-
     /// Constructs a random graph with ```n``` vertices where each undirected
     /// edge has probability ```p``` of occuring in the graph.
     pub fn random(n: usize, p: f32) -> Self {
@@ -57,17 +52,6 @@ impl AdjMatrix {
         self.vertices.insert(v);
     }
 
-    /// Returns the maximum degree of any node in the graph.
-    /// That is the maximal number of neighbors any vertex has.
-    pub fn max_degree(&self) -> usize {
-        let mut max = 0;
-        for u in self.vertices() {
-            max = max.max(self.neighbors(u).count());
-        }
-
-        max
-    }
-
     /// Get index into adjacency array from edge.
     fn get_idx(&self, u: usize, v: usize) -> usize {
         v * self.n + u
@@ -75,6 +59,11 @@ impl AdjMatrix {
 }
 
 impl Graph for AdjMatrix {
+    /// Constructs a new graph with capacity for ```n``` vertices.
+    fn with_capacity(n: usize) -> Self {
+        Self { adj: vec![false; n*n], vertices: HashSet::new(), n: n }
+    }
+
     /// Construct an instance of this type from another ```Graph``` implementor
     fn from_graph<G: Graph>(graph: &G) -> Self {
         let mut g = Self::with_capacity(graph.vertices().count());
