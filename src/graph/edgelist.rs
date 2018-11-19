@@ -38,39 +38,6 @@ impl EdgeList {
 
         g
     }
-
-    /// Adds an edge to the graph.
-    /// ```add_edge(u,v)``` has the same effect as ```add_edge(v,u)```
-    /// as the graph captures undirected edges.
-    /// Adding an edge that already exists has no effect.
-    pub fn add_edge(&mut self, mut u: usize, mut v: usize)  {
-        if u == v {
-            return;
-        }
-
-        if u > v {
-            let t = u;
-            u = v;
-            v = t;
-        }
-
-        self.edges.insert((u,v));
-
-        self.vertices.insert(u);
-        self.vertices.insert(v);
-
-        if !self.neighbors.contains_key(&u) {
-            self.neighbors.insert(u, HashSet::new());
-        }
-
-        self.neighbors.get_mut(&u).unwrap().insert(v);
-
-        if !self.neighbors.contains_key(&v) {
-            self.neighbors.insert(v, HashSet::new());
-        }
-
-        self.neighbors.get_mut(&v).unwrap().insert(u);
-    }
 }
 
 impl Graph for EdgeList {
@@ -100,6 +67,39 @@ impl Graph for EdgeList {
         }
 
         self.edges.contains(&(u,v))
+    }
+
+    /// Adds an edge to the graph.
+    /// ```add_edge(u,v)``` has the same effect as ```add_edge(v,u)```
+    /// as the graph captures undirected edges.
+    /// Adding an edge that already exists has no effect.
+    fn add_edge(&mut self, mut u: usize, mut v: usize)  {
+        if u == v {
+            return;
+        }
+
+        if u > v {
+            let t = u;
+            u = v;
+            v = t;
+        }
+
+        self.edges.insert((u,v));
+
+        self.vertices.insert(u);
+        self.vertices.insert(v);
+
+        if !self.neighbors.contains_key(&u) {
+            self.neighbors.insert(u, HashSet::new());
+        }
+
+        self.neighbors.get_mut(&u).unwrap().insert(v);
+
+        if !self.neighbors.contains_key(&v) {
+            self.neighbors.insert(v, HashSet::new());
+        }
+
+        self.neighbors.get_mut(&v).unwrap().insert(u);
     }
 
     /// Returns an iterator over all the edges in the graph.

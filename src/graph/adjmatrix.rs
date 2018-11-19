@@ -33,25 +33,6 @@ impl AdjMatrix {
         g
     }
 
-    /// Adds an edge to the graph.
-    /// ```add_edge(u,v)``` has the same effect as ```add_edge(v,u)```
-    /// as the graph captures undirected edges.
-    /// Adding an edge that already exists has no effect.
-    pub fn add_edge(&mut self, u: usize, v: usize)  {
-        // Self edges explicitly disallowed
-        if u == v {
-            return;
-        }
-
-        let idx1 = self.get_idx(u, v);
-        let idx2 = self.get_idx(v, u);
-        self.adj[idx1] = true;
-        self.adj[idx2] = true;
-
-        self.vertices.insert(u);
-        self.vertices.insert(v);
-    }
-
     /// Get index into adjacency array from edge.
     fn get_idx(&self, u: usize, v: usize) -> usize {
         v * self.n + u
@@ -77,6 +58,25 @@ impl Graph for AdjMatrix {
     fn has_edge(&self, u: usize, v: usize) -> bool {
         let idx = self.get_idx(u, v);
         self.adj[idx]
+    }
+
+    /// Adds an edge to the graph.
+    /// ```add_edge(u,v)``` has the same effect as ```add_edge(v,u)```
+    /// as the graph captures undirected edges.
+    /// Adding an edge that already exists has no effect.
+    fn add_edge(&mut self, u: usize, v: usize)  {
+        // Self edges explicitly disallowed
+        if u == v {
+            return;
+        }
+
+        let idx1 = self.get_idx(u, v);
+        let idx2 = self.get_idx(v, u);
+        self.adj[idx1] = true;
+        self.adj[idx2] = true;
+
+        self.vertices.insert(u);
+        self.vertices.insert(v);
     }
 
     /// Returns an iterator over all the edges in the graph.
