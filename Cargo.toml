@@ -6,3 +6,10 @@ authors = ["Florian Marending <floriama@student.ethz.ch>"]
 [dependencies]
 rand = "*"
 itertools = "0.7"
+
+[dev-dependencies]
+criterion = "0.2"
+
+[[bench]]
+name = "benchmark"
+harness = false
