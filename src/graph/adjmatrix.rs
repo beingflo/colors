@@ -63,24 +63,24 @@ impl AdjMatrix {
     }
 
     /// Returns an itertator over all the edges in the graph.
-    pub fn edges(&self) -> impl Iterator<Item=(usize,usize)> + '_ {
+    pub fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a> {
         let n = self.n;
-        self.adj.iter().enumerate().filter(|(_, &b)| b).map(move |(i, _)| {
+        Box::new(self.adj.iter().enumerate().filter(|(_, &b)| b).map(move |(i, _)| {
             let u = i / n;
             let v = i % n;
 
             if u > v { (v,u) } else { (u,v) }
-        }).unique()
+        }).unique())
     }
 
     /// Returns an iterator over all the vertices in the graph.
-    pub fn vertices(&self) -> impl Iterator<Item=usize> + '_ {
-        self.vertices.iter().cloned()
+    pub fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
+        Box::new(self.vertices.iter().cloned())
     }
 
     /// Returns an iterator over all the neighboring vertices in the graph.
-    pub fn neighbors(&self, v: usize) -> impl Iterator<Item=usize> + '_ {
-        self.adj[(v * self.n)..(((v+1) * self.n) - 1)].iter().enumerate().filter(|(_, &b)| b).map(|(i, _)| i)
+    pub fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
+        Box::new(self.adj[(v * self.n)..(((v+1) * self.n) - 1)].iter().enumerate().filter(|(_, &b)| b).map(|(i, _)| i))
     }
 
     /// Returns the maximum degree of any node in the graph.
