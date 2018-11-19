@@ -75,6 +75,15 @@ impl AdjMatrix {
 }
 
 impl Graph for AdjMatrix {
+    /// Construct an instance of this type from another ```Graph``` implementor
+    fn from_graph<G: Graph>(graph: &G) -> Self {
+        let mut g = Self::with_capacity(graph.vertices().count());
+        for (u,v) in graph.edges() {
+            g.add_edge(u,v);
+        }
+        g
+    }
+
     /// Queries whether an edge exists in the graph.
     fn has_edge(&self, u: usize, v: usize) -> bool {
         let idx = self.get_idx(u, v);
@@ -108,6 +117,7 @@ impl Graph for AdjMatrix {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use graph::*;
 
     #[test]
     fn creation() {
@@ -229,5 +239,16 @@ mod tests {
         let num_edges = g.edges().count();
 
         assert_eq!(num_edges, 0);
+    }
+
+    #[test]
+    fn from_graph() {
+        let g1 = EdgeList::random(100, 0.5);
+        let g2 = AdjMatrix::from_graph(&g1);
+
+        let edges1 = g1.edges().collect::<HashSet<(usize,usize)>>();
+        let edges2 = g2.edges().collect::<HashSet<(usize,usize)>>();
+
+        assert_eq!(edges1, edges2);
     }
 }

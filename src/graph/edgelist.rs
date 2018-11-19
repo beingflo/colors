@@ -85,6 +85,15 @@ impl EdgeList {
 }
 
 impl Graph for EdgeList {
+    /// Construct an instance of this type from another ```Graph``` implementor
+    fn from_graph<G: Graph>(graph: &G) -> Self {
+        let mut g = Self::new();
+        for (u,v) in graph.edges() {
+            g.add_edge(u,v);
+        }
+        g
+    }
+
     /// Queries whether an edge exists in the graph.
     fn has_edge(&self, mut u: usize, mut v: usize) -> bool {
         if u > v {
@@ -121,6 +130,7 @@ impl Graph for EdgeList {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use graph::*;
 
     #[test]
     fn creation() {
@@ -242,5 +252,16 @@ mod tests {
         let num_edges = g.edges().count();
 
         assert_eq!(num_edges, 0);
+    }
+
+    #[test]
+    fn from_graph() {
+        let g1 = AdjMatrix::random(100, 0.5);
+        let g2 = EdgeList::from_graph(&g1);
+
+        let edges1 = g1.edges().collect::<HashSet<(usize,usize)>>();
+        let edges2 = g2.edges().collect::<HashSet<(usize,usize)>>();
+
+        assert_eq!(edges1, edges2);
     }
 }

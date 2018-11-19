@@ -5,6 +5,9 @@ pub use self::edgelist::EdgeList;
 pub use self::adjmatrix::AdjMatrix;
 
 pub trait Graph {
+    /// Construct an instance of this type from another ```Graph``` implementor
+    fn from_graph<G: Graph>(&G) -> Self;
+
     /// Queries whether an edge exists in the graph.
     fn has_edge(&self, usize, usize) -> bool;
 
