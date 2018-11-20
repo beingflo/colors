@@ -21,7 +21,7 @@ fn main() {
 
         let _ = thread::spawn(move || {
             for _ in 0..slice {
-                let g = AdjMatrix::random(n, p);
+                let g = EdgeList::random(n, p);
 
                 let c1 = rs_coloring(&g);
                 let c2 = cs_coloring(&g);
@@ -41,7 +41,9 @@ fn main() {
     // Drop original tx such that rx.iter() will yield None when last tx_ is dropped
     drop(tx);
 
+    println!("Random graph with {} vertices and {} edge probability\n", n, p);
     println!("rs\tcs\tlf\tsl");
+    println!("---------------------------");
 
     let mut sum = [0; 4];
     for (n1, n2, n3, n4) in rx.iter() {
