@@ -1,12 +1,14 @@
 mod edgelist;
 mod adjmatrix;
 mod growableadjmatrix;
+mod adjlist;
 
 use rand::random;
 
 pub use self::edgelist::EdgeList;
 pub use self::adjmatrix::AdjMatrix;
 pub use self::growableadjmatrix::GrowableAdjMatrix;
+pub use self::adjlist::AdjList;
 
 pub trait Graph: Sized {
     /// Constructs a new graph with capacity for ```n``` vertices.
@@ -16,13 +18,13 @@ pub trait Graph: Sized {
     fn from_graph<G: Graph>(&G) -> Self;
 
     /// Queries whether an edge exists in the graph.
-    fn has_edge(&self, usize, usize) -> bool;
+    fn has_edge(&self, u: usize, v: usize) -> bool;
 
     /// Adds an edge to the graph.
     /// ```add_edge(u,v)``` has the same effect as ```add_edge(v,u)```
     /// as the graph captures undirected edges.
     /// Adding an edge that already exists has no effect.
-    fn add_edge(&mut self, usize, usize);
+    fn add_edge(&mut self, u: usize, v: usize);
 
     /// Returns an iterator over all the edges in the graph.
     fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a>;
@@ -31,7 +33,7 @@ pub trait Graph: Sized {
     fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a>;
 
     /// Returns an iterator over all the neighboring vertices in the graph.
-    fn neighbors<'a>(&'a self, usize) -> Box<Iterator<Item=usize> + 'a>;
+    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a>;
 
     /// Constructs a random graph with ```n``` vertices where each undirected
     /// edge has probability ```p``` of occuring in the graph.
@@ -95,6 +97,12 @@ mod tests {
     #[test]
     fn test_growableadjmatrix() {
         let tester = GraphTester::<GrowableAdjMatrix>::new();
+        tester.run();
+    }
+
+    #[test]
+    fn test_adjlist() {
+        let tester = GraphTester::<AdjList>::new();
         tester.run();
     }
 
