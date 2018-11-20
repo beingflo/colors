@@ -9,6 +9,7 @@ use graph::Graph;
 /// the vertices is captured. Multiple edges and self edges are also disallowed.
 ///
 /// Vertices and edges may not be removed.
+#[derive(Debug, Clone)]
 pub struct AdjMatrix {
     adj: Vec<bool>,
     vertices: HashSet<usize>,
