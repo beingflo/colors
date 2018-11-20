@@ -14,6 +14,7 @@ pub enum ColoringAlgo {
     SL,
 }
 
+/// Color using the specified coloring heuristic.
 pub fn color<G: Graph>(graph: &G, col: ColoringAlgo) -> Coloring {
     match col {
         ColoringAlgo::RS => rs_coloring(graph),
