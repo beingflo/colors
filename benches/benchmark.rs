@@ -65,7 +65,7 @@ fn graphs(c: &mut Criterion) {
     let functions = vec!(edgelist, adjmatrix, gadjmatrix);
     c.bench_functions("Graph Creation", functions, n);
 
-    let n = 100;
+    let n = 50;
     let p = 0.2;
 
     let rs = Fun::new("RS", move |b, _| b.iter(|| colorer::<EdgeList>(C::RS, n, p)));
