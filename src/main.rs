@@ -15,8 +15,12 @@ fn main() {
     let workers = num_cpus::get();
     let (tx, rx) = mpsc::channel();
 
-    for _ in 0..workers {
-        let slice = samples / workers;
+    for i in 0..workers {
+        let mut slice = samples / workers;
+        if i == workers - 1 {
+            // Pick up remaining samples
+            slice += samples - (samples / workers) * workers;
+        }
         let tx_ = tx.clone();
 
         let _ = thread::spawn(move || {
