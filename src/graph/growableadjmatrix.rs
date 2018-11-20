@@ -3,11 +3,18 @@ use std::iter::Iterator;
 
 use graph::Graph;
 
-/// Graph datastructure implemented as an adjacency matrix.
+/// Graph datastructure implemented as a growable adjacency matrix.
 /// The graph is undirected and unweighted - only the connectivity pattern of
 /// the vertices is captured. Multiple edges and self edges are also disallowed.
 ///
 /// Vertices and edges may not be removed.
+///
+/// Warning!
+/// Only use this if querying edges is the main operation and dynamically
+/// growing the graph is necessary. Otherwise consider ```AdjMatrix``` as
+/// ```neighbors``` calls are significantly faster.
+/// If growing is only a necessity initially, consider constructing an ```EdgeList```
+/// and converting to ```AdjMatrix``` via ```AdjMatrix::from_graph```.
 #[derive(Debug, Clone)]
 pub struct GrowableAdjMatrix {
     adj: Vec<bool>,
