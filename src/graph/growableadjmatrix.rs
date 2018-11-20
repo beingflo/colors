@@ -26,7 +26,7 @@ impl GrowableAdjMatrix {
     /// Constructs a new empty graph
     pub fn new() -> Self {
         // Initialize to capacity for 256 vertices
-        GrowableAdjMatrix::with_capacity(GrowableAdjMatrix::get_size(256))
+        Self::with_capacity(Self::get_size(256))
     }
 
     /// Get index into adjacency array from edge.
@@ -50,7 +50,7 @@ impl GrowableAdjMatrix {
 
     /// Resize the capacity of the graph to accommodate ```n``` vertices
     fn resize(&mut self, n: usize) {
-        let new_size = GrowableAdjMatrix::get_size(n);
+        let new_size = Self::get_size(n);
 
         if n < self.cap {
             return;
@@ -70,7 +70,7 @@ impl Graph for GrowableAdjMatrix {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(mut n: usize) -> Self {
         n = n.max(1);
-        let size = GrowableAdjMatrix::get_size(n);
+        let size = Self::get_size(n);
         Self { adj: vec![false; size], vertices: HashSet::new(), cap: n }
     }
 
@@ -89,7 +89,7 @@ impl Graph for GrowableAdjMatrix {
             return false;
         }
 
-        let idx = GrowableAdjMatrix::get_idx(u, v);
+        let idx = Self::get_idx(u, v);
 
         if idx >= self.adj.len() {
             return false;
@@ -114,8 +114,8 @@ impl Graph for GrowableAdjMatrix {
             self.resize(size);
         }
 
-        let idx1 = GrowableAdjMatrix::get_idx(u, v);
-        let idx2 = GrowableAdjMatrix::get_idx(v, u);
+        let idx1 = Self::get_idx(u, v);
+        let idx2 = Self::get_idx(v, u);
         self.adj[idx1] = true;
         self.adj[idx2] = true;
 
