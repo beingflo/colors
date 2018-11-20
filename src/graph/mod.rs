@@ -1,10 +1,12 @@
 mod edgelist;
 mod adjmatrix;
+mod growableadjmatrix;
 
 use rand::random;
 
 pub use self::edgelist::EdgeList;
 pub use self::adjmatrix::AdjMatrix;
+pub use self::growableadjmatrix::GrowableAdjMatrix;
 
 pub trait Graph: Sized {
     /// Constructs a new graph with capacity for ```n``` vertices.
