@@ -5,6 +5,24 @@ use graph::Graph;
 /// This maps from vertices to colors.
 pub type Coloring = HashMap<usize, usize>;
 
+/// Coloring heuristics implemented here.
+#[derive(Debug, Clone, Copy)]
+pub enum ColoringAlgo {
+    RS,
+    CS,
+    LF,
+    SL,
+}
+
+pub fn color<G: Graph>(graph: &G, col: ColoringAlgo) -> Coloring {
+    match col {
+        ColoringAlgo::RS => rs_coloring(graph),
+        ColoringAlgo::CS => cs_coloring(graph),
+        ColoringAlgo::LF => lf_coloring(graph),
+        ColoringAlgo::SL => sl_coloring(graph),
+    }
+}
+
 /// Check whether coloring defines a color for all vertices that exist in the graph.
 pub fn compatible_coloring<G: Graph>(graph: &G, coloring: &Coloring) -> bool {
     for u in graph.vertices() {
@@ -205,7 +223,7 @@ mod tests {
     use graph::*;
 
     #[test]
-    fn creation_empty() {
+    fn coloring_creation_empty() {
         let g = EdgeList::new();
         let c = Coloring::new();
 
@@ -213,7 +231,7 @@ mod tests {
     }
 
     #[test]
-    fn creation_fail() {
+    fn coloring_creation_fail() {
         let mut g = EdgeList::new();
         let c = Coloring::new();
 
@@ -224,7 +242,7 @@ mod tests {
     }
 
     #[test]
-    fn creation_success() {
+    fn coloring_creation_success() {
         let mut g = EdgeList::new();
         let mut c = Coloring::new();
 
@@ -237,7 +255,7 @@ mod tests {
     }
 
     #[test]
-    fn creation_large() {
+    fn coloring_creation_large() {
         let mut g = EdgeList::new();
         let mut c = Coloring::new();
 
@@ -261,7 +279,7 @@ mod tests {
     }
 
     #[test]
-    fn colors() {
+    fn test_num_colors() {
         let mut c = Coloring::new();
 
         for u in 0..100 {
@@ -319,6 +337,59 @@ mod tests {
         let g = EdgeList::random(100, 0.5);
 
         let c = rs_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert!(num_colors(&c) <= g.vertices().count());
+        assert!(num_colors(&c) >= 2);
+        assert!(num_colors(&c) <= g.max_degree() + 1);
+    }
+
+    #[test]
+    fn cs_color() {
+        let mut g = EdgeList::new();
+
+        g.add_edge(1,2);
+
+        let c = cs_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn cs_color2() {
+        let mut g = EdgeList::new();
+
+        g.add_edge(1,2);
+        g.add_edge(1,3);
+
+        let c = cs_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn cs_line() {
+        let mut g = EdgeList::new();
+
+        for i in 0..10 {
+            g.add_edge(i, i+1);
+        }
+
+        let c = cs_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+
+        // Line must be 2-colored by cs-coloring
+        assert!(num_colors(&c) == 2);
+    }
+
+    #[test]
+    fn cs_random() {
+        let g = EdgeList::random(100, 0.5);
+
+        let c = cs_coloring(&g);
 
         assert!(check_coloring(&g, &c));
         assert!(num_colors(&c) <= g.vertices().count());
@@ -605,7 +676,7 @@ mod tests {
         assert!(check_coloring(&g, &c));
 
         // Line must be 2-colored by two-coloring
-        assert!(num_colors(&c) == 2);
+        assert_eq!(num_colors(&c), 2);
     }
 
     #[test]
@@ -619,47 +690,6 @@ mod tests {
         let c = two_coloring(&g);
 
         assert!(c.is_none());
-    }
-
-    #[test]
-    fn cs_color() {
-        let mut g = EdgeList::new();
-
-        g.add_edge(1,2);
-
-        let c = cs_coloring(&g);
-
-        assert!(check_coloring(&g, &c));
-        assert_eq!(num_colors(&c), 2);
-    }
-
-    #[test]
-    fn cs_color2() {
-        let mut g = EdgeList::new();
-
-        g.add_edge(1,2);
-        g.add_edge(1,3);
-
-        let c = cs_coloring(&g);
-
-        assert!(check_coloring(&g, &c));
-        assert_eq!(num_colors(&c), 2);
-    }
-
-    #[test]
-    fn cs_line() {
-        let mut g = EdgeList::new();
-
-        for i in 0..10 {
-            g.add_edge(i, i+1);
-        }
-
-        let c = cs_coloring(&g);
-
-        assert!(check_coloring(&g, &c));
-
-        // Line must be 2-colored by cs-coloring
-        assert!(num_colors(&c) == 2);
     }
 
     #[test]
