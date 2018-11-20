@@ -9,7 +9,7 @@ use graph::Graph;
 ///
 /// Vertices and edges may not be removed.
 ///
-/// Warning!
+/// # Warning
 /// Only use this if querying edges is the main operation and dynamically
 /// growing the graph is necessary. Otherwise consider ```AdjMatrix``` as
 /// ```neighbors``` calls are significantly faster.
