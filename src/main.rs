@@ -28,6 +28,11 @@ fn main() {
                 let c3 = lf_coloring(&g);
                 let c4 = sl_coloring(&g);
 
+                assert!(check_coloring(&g, &c1));
+                assert!(check_coloring(&g, &c2));
+                assert!(check_coloring(&g, &c3));
+                assert!(check_coloring(&g, &c4));
+
                 let n1 = num_colors(&c1);
                 let n2 = num_colors(&c2);
                 let n3 = num_colors(&c3);
