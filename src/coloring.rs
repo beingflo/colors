@@ -149,13 +149,13 @@ pub fn rs_coloring<G: StaticGraph>(graph: &G) -> Coloring {
 /// neighbor that has already been colored.
 pub fn cs_coloring<G: StaticGraph>(graph: &G) -> Coloring {
     // Sequence building stage
-    let mut visited = HashSet::new();
+    let mut visited = vec![false; graph.num_vertices()];
     let mut vec: Vec<usize> = Vec::new();
 
     let n = graph.vertices().count();
 
     let first = graph.vertices().next().unwrap();
-    visited.insert(first);
+    visited[first] = true;
     vec.push(first);
 
     let mut i = 0;
@@ -163,16 +163,16 @@ pub fn cs_coloring<G: StaticGraph>(graph: &G) -> Coloring {
         let v = vec[i];
 
         for u in graph.neighbors(v) {
-            if !visited.contains(&u) {
+            if !visited[u] {
                 vec.push(u);
-                visited.insert(u);
+                visited[u] = true;
             }
         }
         i += 1;
     }
 
     for v in 0..n {
-        if !visited.contains(&v) {
+        if !visited[v] {
             vec.push(v);
         }
     }
