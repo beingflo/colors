@@ -1,9 +1,9 @@
-use std::collections::{ HashMap, HashSet, VecDeque };
+use std::collections::{ HashSet, VecDeque };
 use graph::StaticGraph;
 
 /// Coloring type.
 /// This maps from vertices to colors.
-pub type Coloring = HashMap<usize, usize>;
+pub type Coloring = Vec<usize>;
 
 /// Coloring heuristics implemented here.
 #[derive(Debug, Clone, Copy)]
@@ -26,13 +26,11 @@ pub fn color<G: StaticGraph>(graph: &G, col: ColoringAlgo) -> Coloring {
 
 /// Check whether coloring defines a color for all vertices that exist in the graph.
 pub fn compatible_coloring<G: StaticGraph>(graph: &G, coloring: &Coloring) -> bool {
-    for u in graph.vertices() {
-        if !coloring.contains_key(&u) {
-            return false;
-        }
+    if graph.num_vertices() == coloring.len() {
+        true
+    } else {
+        false
     }
-
-    return true;
 }
 
 /// Check whether no adjacent vertices are in conflict.
@@ -44,7 +42,7 @@ pub fn check_coloring<G: StaticGraph>(graph: &G, coloring: &Coloring) -> bool {
     }
 
     for (u,v) in graph.edges() {
-        if coloring[&u] == coloring[&v] {
+        if coloring[u] == coloring[v] {
             return false;
         }
     }
@@ -56,7 +54,7 @@ pub fn check_coloring<G: StaticGraph>(graph: &G, coloring: &Coloring) -> bool {
 pub fn num_colors(coloring: &Coloring) -> usize {
     let mut colors: HashSet<usize> = HashSet::new();
 
-    for &val in coloring.values() {
+    for &val in coloring.iter() {
         colors.insert(val);
     }
 
@@ -66,31 +64,42 @@ pub fn num_colors(coloring: &Coloring) -> usize {
 /// Returns a 2-coloring of the graph if it exists, ```None``` otherwise.
 /// Can be used as a check for bipartiteness.
 pub fn two_coloring<G: StaticGraph>(graph: &G) -> Option<Coloring> {
-    let mut c = Coloring::new();
+    let mut c: Vec<Option<usize>> = vec![None; graph.num_vertices()];
     let mut q = VecDeque::new();
 
-    let first = graph.vertices().next().unwrap();
+    let first = 0;
     q.push_back(first);
-    c.insert(first, 0);
+    c[first] = Some(0);
 
     while let Some(v) = q.pop_front() {
-        let &color = c.get(&v).unwrap();
+        let color = c[v].unwrap();
 
         for u in graph.neighbors(v) {
-            if let Some(&col) = c.get(&u) {
+            if let Some(col) = c[u] {
                 // Conflict
                 if col == color {
                     return None;
                 }
             } else {
                 // Color neighbors opposite color and put in the frontier
-                c.insert(u, 1-color);
+                c[u] = Some(1-color);
                 q.push_back(u);
             }
         }
     }
 
-    Some(c)
+    // Set any isolated vertices to color '0'
+    for v in c.iter_mut() {
+        if v.is_none() {
+            *v = Some(0);
+        }
+    }
+
+    let coloring: Option<Coloring> = c.into_iter().collect();
+    assert!(coloring.is_some());
+    let coloring = coloring.unwrap();
+
+    Some(coloring)
 }
 
 /// Greedy coloring algorithm.
@@ -99,20 +108,20 @@ pub fn two_coloring<G: StaticGraph>(graph: &G) -> Option<Coloring> {
 pub fn greedy_coloring<G: StaticGraph>(graph: &G, vertices: impl Iterator<Item=usize>) -> Coloring {
     // Must be equal to 'vertices.count()'
     // as 'vertices' must be permutation of 'graph.vertices'
-    let n = graph.vertices().count();
-    let mut c = Coloring::new();
+    let n = graph.num_vertices();
+    let mut c: Vec<Option<usize>> = vec![None; n];
 
     let mut blocked_colors = vec![false; n];
     for v in vertices {
         for u in graph.neighbors(v) {
-            if let Some(&color) = c.get(&u) {
+            if let Some(color) = c[u] {
                 blocked_colors[color] = true;
             }
         }
 
         for x in 0..n {
             if !blocked_colors[x] {
-                c.insert(v, x);
+                c[v] = Some(x);
                 break;
             }
         }
@@ -120,7 +129,11 @@ pub fn greedy_coloring<G: StaticGraph>(graph: &G, vertices: impl Iterator<Item=u
         blocked_colors = vec![false; n];
     }
 
-    c
+    let coloring: Option<Coloring> = c.into_iter().collect();
+    assert!(coloring.is_some());
+    let coloring = coloring.unwrap();
+
+    coloring
 }
 
 /// Returns a random-sequence greedy coloring of the graph where the vertices have
@@ -254,35 +267,34 @@ mod tests {
     #[test]
     fn coloring_creation_success() {
         let mut g = EdgeList::new();
-        let mut c = Coloring::new();
 
         g.add_edge(0,1);
 
-        c.insert(0, 0);
-        c.insert(1, 1);
+        let c = vec![0, 1];
 
         assert!(check_coloring(&g, &c));
     }
 
     #[test]
     fn coloring_creation_large() {
+        let n = 100;
         let mut g = EdgeList::new();
-        let mut c = Coloring::new();
+        let mut c = vec![0; n];
 
-        for u in 0..100 {
-            for v in u..100 {
+        for u in 0..n {
+            for v in u..n {
                 g.add_edge(u,v);
             }
         }
 
         for u in 0..100 {
-            c.insert(u, u);
+            c[u] = u;
         }
 
         assert!(compatible_coloring(&g, &c));
         assert!(check_coloring(&g, &c));
 
-        c.insert(4, 5);
+        c[4] = 5;
 
         assert!(compatible_coloring(&g, &c));
         assert!(!check_coloring(&g, &c));
@@ -290,10 +302,11 @@ mod tests {
 
     #[test]
     fn test_num_colors() {
-        let mut c = Coloring::new();
+        let n = 100;
+        let mut c = vec![0; n];
 
         for u in 0..100 {
-            c.insert(u, u % 11);
+            c[u] = u % 11;
         }
 
         assert_eq!(num_colors(&c), 11);

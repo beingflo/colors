@@ -15,7 +15,7 @@ fn main() {
     let n = 200;
 
     // Edge probability in each sample graph
-    let p = 0.5;
+    let p = 0.9;
 
     // Number of processors
     let workers = num_cpus::get();
