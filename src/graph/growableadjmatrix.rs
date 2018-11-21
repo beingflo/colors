@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use std::iter::Iterator;
 
 use graph::StaticGraph;
@@ -18,7 +17,7 @@ use graph::StaticGraph;
 #[derive(Debug, Clone)]
 pub struct GrowableAdjMatrix {
     adj: Vec<bool>,
-    vertices: HashSet<usize>,
+    n: usize,
     cap: usize,
 }
 
@@ -26,7 +25,7 @@ impl GrowableAdjMatrix {
     /// Constructs a new empty graph
     pub fn new() -> Self {
         // Initialize to capacity for 256 vertices
-        Self::with_capacity(Self::get_size(256))
+        Self::with_capacity(256)
     }
 
     /// Get index into adjacency array from edge.
@@ -68,10 +67,10 @@ impl GrowableAdjMatrix {
 
 impl StaticGraph for GrowableAdjMatrix {
     /// Constructs a new graph with capacity for ```n``` vertices.
-    fn with_capacity(mut n: usize) -> Self {
-        n = n.max(1);
-        let size = Self::get_size(n);
-        Self { adj: vec![false; size], vertices: HashSet::new(), cap: n }
+    fn with_capacity(n: usize) -> Self {
+        let cap = n.max(1);
+        let size = Self::get_size(cap);
+        Self { adj: vec![false; size], n, cap }
     }
 
     /// Construct an instance of this type from another ```StaticGraph``` implementor
@@ -109,18 +108,18 @@ impl StaticGraph for GrowableAdjMatrix {
         }
 
         // Double capacity can vertices could fit
-        while u > self.cap || v > self.cap {
+        while u >= self.cap || v >= self.cap {
             let size = 2*self.cap;
             self.resize(size);
         }
+
+        self.n = self.n.max(u+1);
+        self.n = self.n.max(v+1);
 
         let idx1 = Self::get_idx(u, v);
         let idx2 = Self::get_idx(v, u);
         self.adj[idx1] = true;
         self.adj[idx2] = true;
-
-        self.vertices.insert(u);
-        self.vertices.insert(v);
     }
 
     /// Returns an iterator over all the edges in the graph.
@@ -135,7 +134,11 @@ impl StaticGraph for GrowableAdjMatrix {
 
     /// Returns an iterator over all the vertices in the graph.
     fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
-        Box::new(self.vertices.iter().cloned())
+        if self.n == 0 {
+            Box::new(std::iter::empty())
+        } else {
+            Box::new(0..self.n)
+        }
     }
 
     /// Returns an iterator over all the neighboring vertices in the graph.
