@@ -82,15 +82,6 @@ impl StaticGraph for AdjList {
         })).unique())
     }
 
-    /// Returns an iterator over all the vertices in the graph.
-    fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
-        if self.n == 0 {
-            Box::new(std::iter::empty())
-        } else {
-            Box::new(0..self.n)
-        }
-    }
-
     /// Returns the number of vertices in the graph.
     fn num_vertices(&self) -> usize {
         self.n

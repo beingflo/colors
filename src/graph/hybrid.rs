@@ -54,15 +54,6 @@ impl StaticGraph for Hybrid {
         self.el.edges()
     }
 
-    /// Returns an iterator over all the vertices in the graph.
-    fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
-        if self.num_vertices() == 0 {
-            Box::new(std::iter::empty())
-        } else {
-            Box::new(0..self.el.num_vertices())
-        }
-    }
-
     /// Returns the number of vertices in the graph.
     fn num_vertices(&self) -> usize {
         assert_eq!(self.el.num_vertices(), self.al.num_vertices());

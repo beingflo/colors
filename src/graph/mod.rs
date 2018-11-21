@@ -43,14 +43,21 @@ pub trait StaticGraph: Sized {
     /// Returns an iterator over all the edges in the graph.
     fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a>;
 
-    /// Returns an iterator over all the vertices in the graph.
-    fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a>;
-
     /// Returns the number of vertices in the graph.
     fn num_vertices(&self) -> usize;
 
     /// Returns an iterator over all the neighboring vertices in the graph.
     fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a>;
+
+    /// Returns an iterator over all the vertices in the graph.
+    fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
+        let n = self.num_vertices();
+        if n == 0 {
+            Box::new(std::iter::empty())
+        } else {
+            Box::new(0..n)
+        }
+    }
 
     /// Constructs a random graph with ```n``` vertices where each undirected
     /// edge has probability ```p``` of occuring in the graph.
