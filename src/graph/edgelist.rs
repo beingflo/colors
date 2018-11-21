@@ -1,5 +1,4 @@
 use std::collections::HashSet;
-use std::collections::HashMap;
 use std::iter::Iterator;
 
 use graph::StaticGraph;
@@ -13,14 +12,12 @@ use graph::StaticGraph;
 pub struct EdgeList {
     edges: HashSet<(usize, usize)>,
     n: usize,
-
-    neighbors: HashMap<usize, HashSet<usize>>,
 }
 
 impl EdgeList {
     /// Constructs a new empty graph
     pub fn new() -> Self {
-        Self { edges: HashSet::new(), n: 0, neighbors: HashMap::new() }
+        Self { edges: HashSet::new(), n: 0 }
     }
 }
 
@@ -28,7 +25,7 @@ impl StaticGraph for EdgeList {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(n: usize) -> Self {
         // Only implemented for compatibility, not very much to do here
-        Self { edges: HashSet::new(), n, neighbors: HashMap::new() }
+        Self { edges: HashSet::new(), n, }
     }
 
     /// Construct an instance of this type from another ```StaticGraph``` implementor
@@ -66,22 +63,9 @@ impl StaticGraph for EdgeList {
             v = t;
         }
 
-        self.n = self.n.max(u+1);
         self.n = self.n.max(v+1);
 
         self.edges.insert((u,v));
-
-        if !self.neighbors.contains_key(&u) {
-            self.neighbors.insert(u, HashSet::new());
-        }
-
-        self.neighbors.get_mut(&u).unwrap().insert(v);
-
-        if !self.neighbors.contains_key(&v) {
-            self.neighbors.insert(v, HashSet::new());
-        }
-
-        self.neighbors.get_mut(&v).unwrap().insert(u);
     }
 
     /// Returns an iterator over all the edges in the graph.
@@ -100,10 +84,12 @@ impl StaticGraph for EdgeList {
 
     /// Returns an iterator over all the neighboring vertices in the graph.
     fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
-        if let Some(set) = self.neighbors.get(&v) {
-            Box::new(set.iter().cloned())
-        } else {
-            Box::new(std::iter::empty())
-        }
+        Box::new(self.edges().filter(move |(a,b)| *a == v || *b == v).map(move |(a,b)| {
+            if a == v {
+                b
+            } else {
+                a
+            }
+        }))
     }
 }
