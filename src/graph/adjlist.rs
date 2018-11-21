@@ -2,6 +2,11 @@ use itertools::Itertools;
 
 use graph::StaticGraph;
 
+/// Graph datastructure implemented as an adjacency list.
+/// The graph is undirected and unweighted - only the connectivity pattern of
+/// the vertices is captured. Multiple edges and self edges are also disallowed.
+///
+/// Vertices and edges may not be removed.
 #[derive(Debug, Clone)]
 pub struct AdjList {
     adj: Vec<Vec<usize>>,
