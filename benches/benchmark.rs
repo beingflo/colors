@@ -8,6 +8,7 @@ use criterion::Fun;
 use graml::graph::EdgeList;
 use graml::graph::AdjMatrix;
 use graml::graph::GrowableAdjMatrix;
+use graml::graph::AdjList;
 
 use graml::coloring::*;
 use graml::graph::Graph;
@@ -30,6 +31,14 @@ fn adj_creation(n: usize, p: f32) {
 
 fn gadj_creation(n: usize, p: f32) {
     let g = GrowableAdjMatrix::random(n, p);
+
+    let num_edges = g.edges().count();
+
+    assert!(num_edges > 1);
+}
+
+fn adjl_creation(n: usize, p: f32) {
+    let g = AdjList::random(n, p);
 
     let num_edges = g.edges().count();
 
@@ -61,8 +70,9 @@ fn graphs(c: &mut Criterion) {
     let edgelist = Fun::new("EdgeList", move |b, i| b.iter(|| edgelist_creation(*i, p)));
     let adjmatrix = Fun::new("AdjMatrix", move |b, i| b.iter(|| adj_creation(*i, p)));
     let gadjmatrix = Fun::new("GrowableAdjMatrix", move |b, i| b.iter(|| gadj_creation(*i, p)));
+    let adjlmatrix = Fun::new("AdjList", move |b, i| b.iter(|| adjl_creation(*i, p)));
 
-    let functions = vec!(edgelist, adjmatrix, gadjmatrix);
+    let functions = vec!(edgelist, adjmatrix, gadjmatrix, adjlmatrix);
     c.bench_functions("Graph Creation", functions, n);
 
     let n = 50;
@@ -92,11 +102,20 @@ fn graphs(c: &mut Criterion) {
     let functions = vec!(rs, cs, lf, sl);
     c.bench_functions("Graph Coloring GrowableAdjMatrix", functions, 0);
 
+    let rs = Fun::new("RS", move |b, _| b.iter(|| colorer::<AdjList>(C::RS, n, p)));
+    let cs = Fun::new("CS", move |b, _| b.iter(|| colorer::<AdjList>(C::CS, n, p)));
+    let lf = Fun::new("LF", move |b, _| b.iter(|| colorer::<AdjList>(C::LF, n, p)));
+    let sl = Fun::new("SL", move |b, _| b.iter(|| colorer::<AdjList>(C::SL, n, p)));
+
+    let functions = vec!(rs, cs, lf, sl);
+    c.bench_functions("Graph Coloring AdjList", functions, 0);
+
     let sl_el = Fun::new("EdgeList", move |b, _| b.iter(|| colorer::<EdgeList>(C::SL, n, p)));
     let sl_am = Fun::new("AdjMatrix", move |b, _| b.iter(|| colorer::<AdjMatrix>(C::SL, n, p)));
     let sl_gam = Fun::new("GrowableAdjMatrix", move |b, _| b.iter(|| colorer::<GrowableAdjMatrix>(C::SL, n, p)));
+    let sl_adl = Fun::new("AdjList", move |b, _| b.iter(|| colorer::<AdjList>(C::SL, n, p)));
 
-    let functions = vec![sl_el, sl_am, sl_gam];
+    let functions = vec![sl_el, sl_am, sl_gam, sl_adl];
     c.bench_functions("Graph Coloring SL", functions, 0);
 }
 
