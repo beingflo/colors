@@ -141,7 +141,6 @@ pub fn greedy_coloring<G: StaticGraph>(graph: &G, vertices: impl Iterator<Item=u
 /// There is no guarantee about the number of colors used.
 pub fn rs_coloring<G: StaticGraph>(graph: &G) -> Coloring {
     // No sequence building stage for this algorithm
-    // 'graph.vertices()' returns random order as it's implemented as HashSet
     greedy_coloring(graph, graph.vertices())
 }
 
