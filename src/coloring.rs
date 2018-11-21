@@ -239,6 +239,62 @@ pub fn sl_coloring<G: StaticGraph>(graph: &G) -> Coloring {
 }
 
 
+/// Returns a saturation degree ordered coloring of the graph.
+/// The SDO is defined by the number of distinct colors in the neighborhood -
+/// vertices with a high saturation degree are colored first.
+/// For general graphs there is no guarantee about the number of colors used.
+pub fn sdo_coloring<G: StaticGraph>(graph: &G) -> Coloring {
+    let n = graph.num_vertices();
+    let mut c = vec![None; n];
+
+    let mut left = graph.vertices().collect::<HashSet<usize>>();
+
+    while !left.is_empty() {
+        // Find vertex with highest saturation degree
+        let mut colors = HashSet::new();
+        let mut max_sd = 0;
+        let mut max_sd_idx = 0;
+        for &v in left.iter() {
+            for u in graph.neighbors(v) {
+                if let Some(color) = c[u] {
+                    colors.insert(color);
+                }
+            }
+
+            if colors.len() > max_sd {
+                max_sd = colors.len();
+                max_sd_idx = v;
+            }
+
+            colors.clear();
+        }
+
+        // Reacquire blocking colors for chosen vertex
+        for u in graph.neighbors(max_sd_idx) {
+            if let Some(color) = c[u] {
+                colors.insert(color);
+            }
+        }
+
+        // Color vertex
+        for x in 0..n {
+            if !colors.contains(&x) {
+                c[max_sd_idx] = Some(x);
+                break;
+            }
+        }
+
+        colors.clear();
+        left.remove(&max_sd_idx);
+    }
+
+    let coloring: Option<Coloring> = c.into_iter().collect();
+    assert!(coloring.is_some());
+    let coloring = coloring.unwrap();
+
+    coloring
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -529,6 +585,61 @@ mod tests {
     }
 
     #[test]
+    fn sdo_color() {
+        let mut g = EdgeList::new();
+
+        g.add_edge(0,1);
+
+        let c = sdo_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn sdo_color2() {
+        let mut g = EdgeList::new();
+
+        g.add_edge(0,1);
+        g.add_edge(0,2);
+
+        let c = sdo_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert_eq!(num_colors(&c), 2);
+    }
+
+    #[test]
+    fn sdo_line() {
+        let mut g = EdgeList::new();
+
+        for i in 0..10 {
+            g.add_edge(i, i+1);
+        }
+
+        let c = sdo_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+
+        // Line might not be 2-colored by rs
+        // in case of unfortunate vertex ordering
+        assert!(num_colors(&c) <= 3);
+        assert!(num_colors(&c) <= g.max_degree() + 1);
+    }
+
+    #[test]
+    fn sdo_random() {
+        let g = EdgeList::random(100, 0.5);
+
+        let c = sdo_coloring(&g);
+
+        assert!(check_coloring(&g, &c));
+        assert!(num_colors(&c) <= g.vertices().count());
+        assert!(num_colors(&c) >= 2);
+        assert!(num_colors(&c) <= g.max_degree() + 1);
+    }
+
+    #[test]
     fn tree_coloring() {
         let mut g = EdgeList::new();
 
@@ -543,18 +654,21 @@ mod tests {
         let c2 = sl_coloring(&g);
         let c3 = two_coloring(&g).unwrap();
         let c4 = cs_coloring(&g);
+        let c5 = sdo_coloring(&g);
 
         assert!(check_coloring(&g, &c));
         assert!(check_coloring(&g, &c1));
         assert!(check_coloring(&g, &c2));
         assert!(check_coloring(&g, &c3));
         assert!(check_coloring(&g, &c4));
+        assert!(check_coloring(&g, &c5));
 
         assert!(num_colors(&c) <= 4);
         assert!(num_colors(&c1) <= 4);
         assert!(num_colors(&c2) == 2);
         assert_eq!(num_colors(&c3), 2);
         assert_eq!(num_colors(&c4), 2);
+        assert!(num_colors(&c5) <= 4);
     }
 
     #[test]
@@ -572,6 +686,7 @@ mod tests {
         let c2 = sl_coloring(&g);
         let c3 = two_coloring(&g);
         let c4 = cs_coloring(&g);
+        let c5 = sdo_coloring(&g);
 
         // Even circle => bipartite => 2-colorable
         assert!(c3.is_some());
@@ -582,12 +697,14 @@ mod tests {
         assert!(check_coloring(&g, &c2));
         assert!(check_coloring(&g, &c3));
         assert!(check_coloring(&g, &c4));
+        assert!(check_coloring(&g, &c5));
 
         assert!(num_colors(&c) >= 2 && num_colors(&c) <= 3);
         assert!(num_colors(&c1) >= 2 && num_colors(&c) <= 3);
         assert_eq!(num_colors(&c2), 2);
         assert_eq!(num_colors(&c3), 2);
         assert_eq!(num_colors(&c4), 2);
+        assert!(num_colors(&c5) >= 2 && num_colors(&c5) <= 3);
     }
 
     #[test]
@@ -605,6 +722,7 @@ mod tests {
         let c2 = sl_coloring(&g);
         let c3 = two_coloring(&g);
         let c4 = cs_coloring(&g);
+        let c5 = sdo_coloring(&g);
 
         // Odd circle => not bipartite => not 2-colorable
         assert!(c3.is_none());
@@ -613,11 +731,13 @@ mod tests {
         assert!(check_coloring(&g, &c1));
         assert!(check_coloring(&g, &c2));
         assert!(check_coloring(&g, &c4));
+        assert!(check_coloring(&g, &c5));
 
         assert_eq!(num_colors(&c), 3);
         assert_eq!(num_colors(&c1), 3);
         assert_eq!(num_colors(&c2), 3);
         assert_eq!(num_colors(&c4), 3);
+        assert_eq!(num_colors(&c5), 3);
     }
 
     #[test]
@@ -638,18 +758,26 @@ mod tests {
         let c = rs_coloring(&g);
         let c1 = lf_coloring(&g);
         let c2 = sl_coloring(&g);
+        let c3 = cs_coloring(&g);
+        let c4 = sdo_coloring(&g);
 
         assert!(check_coloring(&g, &c));
         assert!(check_coloring(&g, &c1));
         assert!(check_coloring(&g, &c2));
+        assert!(check_coloring(&g, &c3));
+        assert!(check_coloring(&g, &c4));
 
         assert!(num_colors(&c) <= 4);
         assert!(num_colors(&c1) <= 4);
         assert!(num_colors(&c2) <= 4);
+        assert!(num_colors(&c3) <= 4);
+        assert!(num_colors(&c4) <= 4);
 
         assert!(num_colors(&c) >= 3);
         assert!(num_colors(&c1) >= 3);
         assert!(num_colors(&c2) >= 3);
+        assert!(num_colors(&c3) >= 3);
+        assert!(num_colors(&c4) >= 3);
     }
 
     #[test]

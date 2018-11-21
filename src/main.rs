@@ -45,21 +45,24 @@ fn main() {
                 let c2 = cs_coloring(&g);
                 let c3 = lf_coloring(&g);
                 let c4 = sl_coloring(&g);
+                let c5 = sdo_coloring(&g);
 
                 // Check colorings
                 assert!(check_coloring(&g, &c1));
                 assert!(check_coloring(&g, &c2));
                 assert!(check_coloring(&g, &c3));
                 assert!(check_coloring(&g, &c4));
+                assert!(check_coloring(&g, &c5));
 
                 // Count number of colors used
                 let n1 = num_colors(&c1);
                 let n2 = num_colors(&c2);
                 let n3 = num_colors(&c3);
                 let n4 = num_colors(&c4);
+                let n5 = num_colors(&c5);
 
                 // Send to main thread
-                tx_.send((n1,n2,n3,n4)).unwrap();
+                tx_.send((n1,n2,n3,n4,n5)).unwrap();
             }
         });
     }
@@ -69,24 +72,23 @@ fn main() {
 
     // Print results
     println!("Random graph with {} vertices and {} edge probability\n", n, p);
-    println!("rs\tcs\tlf\tsl");
-    println!("---------------------------");
+    println!("rs\tcs\tlf\tsl\tsdo\n");
 
-    let mut sum = [0; 4];
+    let mut sum = [0; 5];
 
     // Iterate over all values received by worker threads
-    for (n1, n2, n3, n4) in rx.iter() {
-        println!("{}\t{}\t{}\t{}", n1, n2, n3, n4);
+    for (n1, n2, n3, n4, n5) in rx.iter() {
+        println!("{}\t{}\t{}\t{}\t{}", n1, n2, n3, n4, n5);
 
         sum[0] += n1;
         sum[1] += n2;
         sum[2] += n3;
         sum[3] += n4;
+        sum[4] += n5;
     }
 
 
-    println!("---------------------------");
-    println!("{}\t{}\t{}\t{}", sum[0] as f32/samples as f32,
+    println!("\n{}\t{}\t{}\t{}\t{}", sum[0] as f32/samples as f32,
              sum[1] as f32/samples as f32, sum[2] as f32/samples as f32,
-             sum[3] as f32/samples as f32);
+             sum[3] as f32/samples as f32, sum[4] as f32/samples as f32);
 }
