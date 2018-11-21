@@ -146,7 +146,8 @@ pub fn cs_coloring<G: StaticGraph>(graph: &G) -> Coloring {
     visited.insert(first);
     vec.push(first);
 
-    for i in 0..n {
+    let mut i = 0;
+    while i < vec.len() {
         let v = vec[i];
 
         for u in graph.neighbors(v) {
@@ -154,6 +155,13 @@ pub fn cs_coloring<G: StaticGraph>(graph: &G) -> Coloring {
                 vec.push(u);
                 visited.insert(u);
             }
+        }
+        i += 1;
+    }
+
+    for v in 0..n {
+        if !visited.contains(&v) {
+            vec.push(v);
         }
     }
 

@@ -26,9 +26,9 @@ impl EdgeList {
 
 impl StaticGraph for EdgeList {
     /// Constructs a new graph with capacity for ```n``` vertices.
-    fn with_capacity(_n: usize) -> Self {
+    fn with_capacity(n: usize) -> Self {
         // Only implemented for compatibility, not very much to do here
-        Self::new()
+        Self { edges: HashSet::new(), n, neighbors: HashMap::new() }
     }
 
     /// Construct an instance of this type from another ```StaticGraph``` implementor
@@ -66,8 +66,8 @@ impl StaticGraph for EdgeList {
             v = t;
         }
 
-        self.n = self.n.max(u);
-        self.n = self.n.max(v);
+        self.n = self.n.max(u+1);
+        self.n = self.n.max(v+1);
 
         self.edges.insert((u,v));
 
@@ -94,7 +94,7 @@ impl StaticGraph for EdgeList {
         if self.n == 0 {
             Box::new(std::iter::empty())
         } else {
-            Box::new(0..self.n+1)
+            Box::new(0..self.n)
         }
     }
 

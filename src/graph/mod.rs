@@ -20,7 +20,8 @@ pub type Graph = AdjList;
 /// vertices is added.
 /// # Vertices
 /// Vertices should be in consecutive order. That is if ```add_edge(1,2)``` is called,
-/// the ```vertices``` iterator will yield ```[0, 1, 2]```.
+/// the ```vertices``` iterator will yield ```[0, 1, 2]```. With ```0``` being an isolated
+/// vertex.
 pub trait StaticGraph: Sized {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(n: usize) -> Self;
