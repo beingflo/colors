@@ -1,16 +1,15 @@
-use std::collections::HashSet;
 use itertools::Itertools;
 
 use graph::StaticGraph;
 
 pub struct AdjList {
     adj: Vec<Vec<usize>>,
-    vertices: HashSet<usize>,
+    n: usize,
 }
 
 impl AdjList {
     pub fn new() -> Self {
-        Self { adj: vec![], vertices: HashSet::new() }
+        Self { adj: vec![], n: 0 }
     }
 }
 
@@ -22,7 +21,7 @@ impl StaticGraph for AdjList {
             adj.push(vec![]);
         }
 
-        Self { adj, vertices: HashSet::new() }
+        Self { adj, n: 0 }
     }
 
     /// Construct an instance of this type from another ```StaticGraph``` implementor
@@ -58,6 +57,9 @@ impl StaticGraph for AdjList {
             return;
         }
 
+        self.n = self.n.max(u);
+        self.n = self.n.max(v);
+
         while self.adj.len() <= u {
             self.adj.push(vec![]);
         }
@@ -69,9 +71,6 @@ impl StaticGraph for AdjList {
         if !self.has_edge(u,v) {
             self.adj[u].push(v);
             self.adj[v].push(u);
-
-            self.vertices.insert(u);
-            self.vertices.insert(v);
         }
     }
 
@@ -84,7 +83,11 @@ impl StaticGraph for AdjList {
 
     /// Returns an iterator over all the vertices in the graph.
     fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
-        Box::new(self.vertices.iter().cloned())
+        if self.n == 0 {
+            Box::new(std::iter::empty())
+        } else {
+            Box::new(0..self.n+1)
+        }
     }
 
     /// Returns an iterator over all the neighboring vertices in the graph.
