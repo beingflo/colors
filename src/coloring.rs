@@ -562,8 +562,8 @@ mod tests {
         assert!(check_coloring(&g, &c3));
         assert!(check_coloring(&g, &c4));
 
-        assert_eq!(num_colors(&c), 3);
-        assert_eq!(num_colors(&c1), 3);
+        assert!(num_colors(&c) >= 2 && num_colors(&c) <= 3);
+        assert!(num_colors(&c1) >= 2 && num_colors(&c) <= 3);
         assert_eq!(num_colors(&c2), 2);
         assert_eq!(num_colors(&c3), 2);
         assert_eq!(num_colors(&c4), 2);

@@ -18,6 +18,9 @@ pub type Graph = AdjList;
 /// the capacity of the graph.
 /// Implementations may however dynamically grow the graph when an edge with large
 /// vertices is added.
+/// # Vertices
+/// Vertices should be in consecutive order. That is if ```add_edge(1,2)``` is called,
+/// the ```vertices``` iterator will yield ```[0, 1, 2]```.
 pub trait StaticGraph: Sized {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(n: usize) -> Self;

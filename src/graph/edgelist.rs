@@ -12,7 +12,7 @@ use graph::StaticGraph;
 #[derive(Debug, Clone)]
 pub struct EdgeList {
     edges: HashSet<(usize, usize)>,
-    vertices: HashSet<usize>,
+    n: usize,
 
     neighbors: HashMap<usize, HashSet<usize>>,
 }
@@ -20,17 +20,15 @@ pub struct EdgeList {
 impl EdgeList {
     /// Constructs a new empty graph
     pub fn new() -> Self {
-        Self { edges: HashSet::new(), vertices: HashSet::new(), neighbors: HashMap::new() }
+        Self { edges: HashSet::new(), n: 0, neighbors: HashMap::new() }
     }
 }
 
 impl StaticGraph for EdgeList {
     /// Constructs a new graph with capacity for ```n``` vertices.
-    fn with_capacity(n: usize) -> Self {
-        // Only implemented for compatibility, not very useful here
-        let mut g = Self::new();
-        g.vertices.reserve(n);
-        g
+    fn with_capacity(_n: usize) -> Self {
+        // Only implemented for compatibility, not very much to do here
+        Self::new()
     }
 
     /// Construct an instance of this type from another ```StaticGraph``` implementor
@@ -68,10 +66,10 @@ impl StaticGraph for EdgeList {
             v = t;
         }
 
-        self.edges.insert((u,v));
+        self.n = self.n.max(u);
+        self.n = self.n.max(v);
 
-        self.vertices.insert(u);
-        self.vertices.insert(v);
+        self.edges.insert((u,v));
 
         if !self.neighbors.contains_key(&u) {
             self.neighbors.insert(u, HashSet::new());
@@ -93,7 +91,11 @@ impl StaticGraph for EdgeList {
 
     /// Returns an iterator over all the vertices in the graph.
     fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
-        Box::new(self.vertices.iter().cloned())
+        if self.n == 0 {
+            Box::new(std::iter::empty())
+        } else {
+            Box::new(0..self.n+1)
+        }
     }
 
     /// Returns an iterator over all the neighboring vertices in the graph.
