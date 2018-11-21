@@ -102,21 +102,23 @@ pub fn greedy_coloring<G: StaticGraph>(graph: &G, vertices: impl Iterator<Item=u
     let n = graph.vertices().count();
     let mut c = Coloring::new();
 
+    let mut blocked_colors = vec![false; n];
     for v in vertices {
-        let mut blocked_colors = HashSet::new();
         for u in graph.neighbors(v) {
-            if let Some(color) = c.get(&u) {
-                blocked_colors.insert(*color);
+            if let Some(&color) = c.get(&u) {
+                blocked_colors[color] = true;
             }
         }
 
 
         for x in 0..n {
-            if !blocked_colors.contains(&x) {
+            if !blocked_colors[x] {
                 c.insert(v, x);
                 break;
             }
         }
+
+        blocked_colors = vec![false; n];
     }
 
     c
