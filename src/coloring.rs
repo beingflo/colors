@@ -202,24 +202,24 @@ pub fn lf_coloring<G: StaticGraph>(graph: &G) -> Coloring {
 pub fn sl_coloring<G: StaticGraph>(graph: &G) -> Coloring {
     // Sequence building stage
     // Inefficient implementation
-    let mut k = Vec::new();
-    let mut k_set = HashSet::new();
-
-    let n = graph.vertices().count();
+    let n = graph.num_vertices();
+    let mut k_set = vec![false; n];
+    let mut k = Vec::with_capacity(n);
+    let mut notk = graph.vertices().collect::<HashSet<usize>>();
 
     while k.len() < n {
         let mut min_d = std::usize::MAX;
         let mut min_d_idx = 0;
-        for v in graph.vertices() {
+        for &v in notk.iter() {
             // Only look at vertices not in k
-            if k_set.contains(&v) {
+            if k_set[v] {
                 continue;
             }
 
             // Look for min degree of vertices not in k
             let mut degree = 0;
             for u in graph.neighbors(v) {
-                if !k_set.contains(&u) {
+                if !k_set[u] {
                     degree += 1;
                 }
             }
@@ -230,7 +230,8 @@ pub fn sl_coloring<G: StaticGraph>(graph: &G) -> Coloring {
         }
 
         k.push(min_d_idx);
-        k_set.insert(min_d_idx);
+        k_set[min_d_idx] = true;
+        notk.remove(&min_d_idx);
     }
 
     // Greedy coloring with reversed order of k
