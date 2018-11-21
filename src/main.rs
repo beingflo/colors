@@ -38,7 +38,7 @@ fn main() {
         let _ = thread::spawn(move || {
             for _ in 0..slice {
                 // Create new graph
-                let g = AdjList::random(n, p);
+                let g = Graph::random(n, p);
 
                 // Perform colorings
                 let c1 = rs_coloring(&g);

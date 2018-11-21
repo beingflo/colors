@@ -10,6 +10,8 @@ pub use self::adjmatrix::AdjMatrix;
 pub use self::growableadjmatrix::GrowableAdjMatrix;
 pub use self::adjlist::AdjList;
 
+pub type Graph = AdjList;
+
 /// The trait to be implemented by any graph datastructure.
 /// This requires that graphs can be instantiated with a given capacity
 /// and adding edges must work properly if the vertices of the edge are within
