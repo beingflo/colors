@@ -46,6 +46,14 @@ fn adjl_creation(n: usize, p: f32) {
     assert!(num_edges > 1);
 }
 
+fn hybrid_creation(n: usize, p: f32) {
+    let g = Hybrid::random(n, p);
+
+    let num_edges = g.edges().count();
+
+    assert!(num_edges > 1);
+}
+
 #[derive(Copy, Clone)]
 enum C {
     RS,
@@ -72,6 +80,7 @@ fn graphs(c: &mut Criterion) {
     let adjmatrix = Fun::new("AdjMatrix", move |b, i| b.iter(|| adj_creation(*i, p)));
     let gadjmatrix = Fun::new("GrowableAdjMatrix", move |b, i| b.iter(|| gadj_creation(*i, p)));
     let adjlmatrix = Fun::new("AdjList", move |b, i| b.iter(|| adjl_creation(*i, p)));
+    let hybrid = Fun::new("Hybrid", move |b, i| b.iter(|| hybrid_creation(*i, p)));
 
     let functions = vec!(edgelist, adjmatrix, gadjmatrix, adjlmatrix);
     c.bench_functions("Graph Creation", functions, n);

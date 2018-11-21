@@ -13,7 +13,7 @@ use graph::StaticGraph;
 /// growing the graph is necessary. Otherwise consider ```AdjMatrix``` as
 /// ```neighbors``` calls are significantly faster.
 /// If growing is only a necessity initially, consider constructing an ```EdgeList```
-/// and converting to ```AdjMatrix``` via ```AdjMatrix::from_graph```.
+/// and converting to ```GrowableAdjMatrix``` via ```GrowableAdjMatrix::from_graph```.
 #[derive(Debug, Clone)]
 pub struct GrowableAdjMatrix {
     adj: Vec<bool>,
