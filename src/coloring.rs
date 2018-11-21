@@ -15,14 +15,32 @@ pub enum ColoringAlgo {
     SDO,
 }
 
-/// Color using the specified coloring heuristic.
-pub fn color<G: StaticGraph>(graph: &G, col: ColoringAlgo) -> Coloring {
-    match col {
-        ColoringAlgo::RS => rs_coloring(graph),
-        ColoringAlgo::CS => cs_coloring(graph),
-        ColoringAlgo::LF => lf_coloring(graph),
-        ColoringAlgo::SL => sl_coloring(graph),
-        ColoringAlgo::SDO => sdo_coloring(graph),
+/// Color the graph with all available methods and return the best coloring.
+pub fn color<G: StaticGraph>(graph: &G) -> Coloring {
+    let c1 = rs_coloring(graph);
+    let c2 = cs_coloring(graph);
+    let c3 = lf_coloring(graph);
+    let c4 = sl_coloring(graph);
+    let c5 = sdo_coloring(graph);
+
+    let n1 = num_colors(&c1);
+    let n2 = num_colors(&c2);
+    let n3 = num_colors(&c3);
+    let n4 = num_colors(&c4);
+    let n5 = num_colors(&c5);
+
+    let min = n1.min(n2.min(n3.min(n4.min(n5))));
+
+    if min == n1 {
+        c1
+    } else if min == n2 {
+        c2
+    } else if min == n3 {
+        c3
+    } else if min == n4 {
+        c4
+    } else {
+        c5
     }
 }
 
