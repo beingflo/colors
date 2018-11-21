@@ -48,20 +48,13 @@ fn hybrid_creation(n: usize, p: f32) {
     assert!(num_edges > 1);
 }
 
-#[derive(Copy, Clone)]
-enum C {
-    RS,
-    CS,
-    LF,
-    SL,
-}
-
-fn colorer<G: StaticGraph>(c: C, g: &G) {
+fn colorer<G: StaticGraph>(c: ColoringAlgo, g: &G) {
     match c {
-        C::RS => rs_coloring(g),
-        C::CS => cs_coloring(g),
-        C::LF => lf_coloring(g),
-        C::SL => sl_coloring(g),
+        ColoringAlgo::RS => rs_coloring(g),
+        ColoringAlgo::CS => cs_coloring(g),
+        ColoringAlgo::LF => lf_coloring(g),
+        ColoringAlgo::SL => sl_coloring(g),
+        ColoringAlgo::SDO => sdo_coloring(g),
     };
 }
 
@@ -81,44 +74,49 @@ fn graphs(c: &mut Criterion) {
     let n = 50;
     let p = 0.2;
 
-    let rs = Fun::new("RS", move |b, g| b.iter(|| colorer::<EdgeList>(C::RS, g)));
-    let cs = Fun::new("CS", move |b, g| b.iter(|| colorer::<EdgeList>(C::CS, g)));
-    let lf = Fun::new("LF", move |b, g| b.iter(|| colorer::<EdgeList>(C::LF, g)));
-    let sl = Fun::new("SL", move |b, g| b.iter(|| colorer::<EdgeList>(C::SL, g)));
+    let rs = Fun::new("RS", move |b, g| b.iter(|| colorer::<EdgeList>(ColoringAlgo::RS, g)));
+    let cs = Fun::new("CS", move |b, g| b.iter(|| colorer::<EdgeList>(ColoringAlgo::CS, g)));
+    let lf = Fun::new("LF", move |b, g| b.iter(|| colorer::<EdgeList>(ColoringAlgo::LF, g)));
+    let sl = Fun::new("SL", move |b, g| b.iter(|| colorer::<EdgeList>(ColoringAlgo::SL, g)));
+    let sdo = Fun::new("SDO", move |b, g| b.iter(|| colorer::<EdgeList>(ColoringAlgo::SDO, g)));
 
-    let functions = vec!(rs, cs, lf, sl);
+    let functions = vec!(rs, cs, lf, sl, sdo);
     c.bench_functions("Graph Coloring EdgeList", functions, EdgeList::random(n,p));
 
-    let rs = Fun::new("RS", move |b, g| b.iter(|| colorer::<AdjMatrix>(C::RS, g)));
-    let cs = Fun::new("CS", move |b, g| b.iter(|| colorer::<AdjMatrix>(C::CS, g)));
-    let lf = Fun::new("LF", move |b, g| b.iter(|| colorer::<AdjMatrix>(C::LF, g)));
-    let sl = Fun::new("SL", move |b, g| b.iter(|| colorer::<AdjMatrix>(C::SL, g)));
+    let rs = Fun::new("RS", move |b, g| b.iter(|| colorer::<AdjMatrix>(ColoringAlgo::RS, g)));
+    let cs = Fun::new("CS", move |b, g| b.iter(|| colorer::<AdjMatrix>(ColoringAlgo::CS, g)));
+    let lf = Fun::new("LF", move |b, g| b.iter(|| colorer::<AdjMatrix>(ColoringAlgo::LF, g)));
+    let sl = Fun::new("SL", move |b, g| b.iter(|| colorer::<AdjMatrix>(ColoringAlgo::SL, g)));
+    let sdo = Fun::new("SDO", move |b, g| b.iter(|| colorer::<AdjMatrix>(ColoringAlgo::SDO, g)));
 
-    let functions = vec!(rs, cs, lf, sl);
+    let functions = vec!(rs, cs, lf, sl, sdo);
     c.bench_functions("Graph Coloring AdjMatrix", functions, AdjMatrix::random(n,p));
 
-    let rs = Fun::new("RS", move |b, g| b.iter(|| colorer::<GrowableAdjMatrix>(C::RS, g)));
-    let cs = Fun::new("CS", move |b, g| b.iter(|| colorer::<GrowableAdjMatrix>(C::CS, g)));
-    let lf = Fun::new("LF", move |b, g| b.iter(|| colorer::<GrowableAdjMatrix>(C::LF, g)));
-    let sl = Fun::new("SL", move |b, g| b.iter(|| colorer::<GrowableAdjMatrix>(C::SL, g)));
+    let rs = Fun::new("RS", move |b, g| b.iter(|| colorer::<GrowableAdjMatrix>(ColoringAlgo::RS, g)));
+    let cs = Fun::new("CS", move |b, g| b.iter(|| colorer::<GrowableAdjMatrix>(ColoringAlgo::CS, g)));
+    let lf = Fun::new("LF", move |b, g| b.iter(|| colorer::<GrowableAdjMatrix>(ColoringAlgo::LF, g)));
+    let sl = Fun::new("SL", move |b, g| b.iter(|| colorer::<GrowableAdjMatrix>(ColoringAlgo::SL, g)));
+    let sdo = Fun::new("SDO", move |b, g| b.iter(|| colorer::<GrowableAdjMatrix>(ColoringAlgo::SDO, g)));
 
-    let functions = vec!(rs, cs, lf, sl);
+    let functions = vec!(rs, cs, lf, sl, sdo);
     c.bench_functions("Graph Coloring GrowableAdjMatrix", functions, GrowableAdjMatrix::random(n,p));
 
-    let rs = Fun::new("RS", move |b, g| b.iter(|| colorer::<AdjList>(C::RS, g)));
-    let cs = Fun::new("CS", move |b, g| b.iter(|| colorer::<AdjList>(C::CS, g)));
-    let lf = Fun::new("LF", move |b, g| b.iter(|| colorer::<AdjList>(C::LF, g)));
-    let sl = Fun::new("SL", move |b, g| b.iter(|| colorer::<AdjList>(C::SL, g)));
+    let rs = Fun::new("RS", move |b, g| b.iter(|| colorer::<AdjList>(ColoringAlgo::RS, g)));
+    let cs = Fun::new("CS", move |b, g| b.iter(|| colorer::<AdjList>(ColoringAlgo::CS, g)));
+    let lf = Fun::new("LF", move |b, g| b.iter(|| colorer::<AdjList>(ColoringAlgo::LF, g)));
+    let sl = Fun::new("SL", move |b, g| b.iter(|| colorer::<AdjList>(ColoringAlgo::SL, g)));
+    let sdo = Fun::new("SDO", move |b, g| b.iter(|| colorer::<AdjList>(ColoringAlgo::SDO, g)));
 
-    let functions = vec!(rs, cs, lf, sl);
+    let functions = vec!(rs, cs, lf, sl, sdo);
     c.bench_functions("Graph Coloring AdjList", functions, AdjList::random(n,p));
 
-    let rs = Fun::new("RS", move |b, g| b.iter(|| colorer::<Hybrid>(C::RS, g)));
-    let cs = Fun::new("CS", move |b, g| b.iter(|| colorer::<Hybrid>(C::CS, g)));
-    let lf = Fun::new("LF", move |b, g| b.iter(|| colorer::<Hybrid>(C::LF, g)));
-    let sl = Fun::new("SL", move |b, g| b.iter(|| colorer::<Hybrid>(C::SL, g)));
+    let rs = Fun::new("RS", move |b, g| b.iter(|| colorer::<Hybrid>(ColoringAlgo::RS, g)));
+    let cs = Fun::new("CS", move |b, g| b.iter(|| colorer::<Hybrid>(ColoringAlgo::CS, g)));
+    let lf = Fun::new("LF", move |b, g| b.iter(|| colorer::<Hybrid>(ColoringAlgo::LF, g)));
+    let sl = Fun::new("SL", move |b, g| b.iter(|| colorer::<Hybrid>(ColoringAlgo::SL, g)));
+    let sdo = Fun::new("SDO", move |b, g| b.iter(|| colorer::<Hybrid>(ColoringAlgo::SDO, g)));
 
-    let functions = vec!(rs, cs, lf, sl);
+    let functions = vec!(rs, cs, lf, sl, sdo);
     c.bench_functions("Graph Coloring Hybrid", functions, Hybrid::random(n,p));
 }
 

@@ -12,6 +12,7 @@ pub enum ColoringAlgo {
     CS,
     LF,
     SL,
+    SDO,
 }
 
 /// Color using the specified coloring heuristic.
@@ -21,6 +22,7 @@ pub fn color<G: StaticGraph>(graph: &G, col: ColoringAlgo) -> Coloring {
         ColoringAlgo::CS => cs_coloring(graph),
         ColoringAlgo::LF => lf_coloring(graph),
         ColoringAlgo::SL => sl_coloring(graph),
+        ColoringAlgo::SDO => sdo_coloring(graph),
     }
 }
 
