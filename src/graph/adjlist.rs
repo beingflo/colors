@@ -57,8 +57,8 @@ impl StaticGraph for AdjList {
             return;
         }
 
-        self.n = self.n.max(u);
-        self.n = self.n.max(v);
+        self.n = self.n.max(u+1);
+        self.n = self.n.max(v+1);
 
         while self.adj.len() <= u {
             self.adj.push(vec![]);
@@ -86,7 +86,7 @@ impl StaticGraph for AdjList {
         if self.n == 0 {
             Box::new(std::iter::empty())
         } else {
-            Box::new(0..self.n+1)
+            Box::new(0..self.n)
         }
     }
 

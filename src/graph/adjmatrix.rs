@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use std::iter::Iterator;
 use itertools::Itertools;
 
@@ -12,7 +11,6 @@ use graph::StaticGraph;
 #[derive(Debug, Clone)]
 pub struct AdjMatrix {
     adj: Vec<bool>,
-    vertices: HashSet<usize>,
     n: usize,
 }
 
@@ -26,7 +24,7 @@ impl AdjMatrix {
 impl StaticGraph for AdjMatrix {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(n: usize) -> Self {
-        Self { adj: vec![false; n*n], vertices: HashSet::new(), n: n }
+        Self { adj: vec![false; n*n], n: n }
     }
 
     /// Construct an instance of this type from another ```StaticGraph``` implementor
@@ -64,9 +62,6 @@ impl StaticGraph for AdjMatrix {
 
         self.adj[idx1] = true;
         self.adj[idx2] = true;
-
-        self.vertices.insert(u);
-        self.vertices.insert(v);
     }
 
     /// Returns an iterator over all the edges in the graph.
@@ -82,7 +77,11 @@ impl StaticGraph for AdjMatrix {
 
     /// Returns an iterator over all the vertices in the graph.
     fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
-        Box::new(self.vertices.iter().cloned())
+        if self.n == 0 {
+            Box::new(std::iter::empty())
+        } else {
+            Box::new(0..self.n+1)
+        }
     }
 
     /// Returns an iterator over all the neighboring vertices in the graph.
