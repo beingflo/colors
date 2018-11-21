@@ -77,8 +77,9 @@ impl Graph for AdjList {
 
     /// Returns an iterator over all the edges in the graph.
     fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a> {
-        // TODO unique
-        Box::new(self.adj.iter().enumerate().flat_map(|(u, vec)| vec.iter().map(move |&v| (u, v))))
+        Box::new(self.adj.iter().enumerate().flat_map(|(u, vec)| vec.iter().map(move |&v| {
+            if u > v { (v,u) } else { (u,v) }
+        })).unique())
     }
 
     /// Returns an iterator over all the vertices in the graph.
