@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::iter::Iterator;
 
-use graph::Graph;
+use graph::StaticGraph;
 
 /// Graph datastructure implemented as a growable adjacency matrix.
 /// The graph is undirected and unweighted - only the connectivity pattern of
@@ -66,7 +66,7 @@ impl GrowableAdjMatrix {
     }
 }
 
-impl Graph for GrowableAdjMatrix {
+impl StaticGraph for GrowableAdjMatrix {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(mut n: usize) -> Self {
         n = n.max(1);
@@ -74,8 +74,8 @@ impl Graph for GrowableAdjMatrix {
         Self { adj: vec![false; size], vertices: HashSet::new(), cap: n }
     }
 
-    /// Construct an instance of this type from another ```Graph``` implementor
-    fn from_graph<G: Graph>(graph: &G) -> Self {
+    /// Construct an instance of this type from another ```StaticGraph``` implementor
+    fn from_graph<G: StaticGraph>(graph: &G) -> Self {
         let mut g = Self::with_capacity(graph.vertices().count());
         for (u,v) in graph.edges() {
             g.add_edge(u,v);

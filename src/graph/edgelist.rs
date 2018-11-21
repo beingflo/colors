@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::collections::HashMap;
 use std::iter::Iterator;
 
-use graph::Graph;
+use graph::StaticGraph;
 
 /// Graph datastructure implemented as a set of edges.
 /// The graph is undirected and unweighted - only the connectivity pattern of
@@ -24,7 +24,7 @@ impl EdgeList {
     }
 }
 
-impl Graph for EdgeList {
+impl StaticGraph for EdgeList {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(n: usize) -> Self {
         // Only implemented for compatibility, not very useful here
@@ -33,8 +33,8 @@ impl Graph for EdgeList {
         g
     }
 
-    /// Construct an instance of this type from another ```Graph``` implementor
-    fn from_graph<G: Graph>(graph: &G) -> Self {
+    /// Construct an instance of this type from another ```StaticGraph``` implementor
+    fn from_graph<G: StaticGraph>(graph: &G) -> Self {
         let mut g = Self::new();
         for (u,v) in graph.edges() {
             g.add_edge(u,v);

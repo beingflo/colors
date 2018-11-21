@@ -11,7 +11,7 @@ use graml::graph::GrowableAdjMatrix;
 use graml::graph::AdjList;
 
 use graml::coloring::*;
-use graml::graph::Graph;
+use graml::graph::StaticGraph;
 
 fn edgelist_creation(n: usize, p: f32) {
     let g = EdgeList::random(n, p);
@@ -53,7 +53,7 @@ enum C {
     SL,
 }
 
-fn colorer<G: Graph>(c: C, n: usize, p: f32) {
+fn colorer<G: StaticGraph>(c: C, n: usize, p: f32) {
     let g = G::random(n, p);
     match c {
         C::RS => rs_coloring(&g),

@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::iter::Iterator;
 use itertools::Itertools;
 
-use graph::Graph;
+use graph::StaticGraph;
 
 /// Graph datastructure implemented as an adjacency matrix.
 /// The graph is undirected and unweighted - only the connectivity pattern of
@@ -23,14 +23,14 @@ impl AdjMatrix {
     }
 }
 
-impl Graph for AdjMatrix {
+impl StaticGraph for AdjMatrix {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(n: usize) -> Self {
         Self { adj: vec![false; n*n], vertices: HashSet::new(), n: n }
     }
 
-    /// Construct an instance of this type from another ```Graph``` implementor
-    fn from_graph<G: Graph>(graph: &G) -> Self {
+    /// Construct an instance of this type from another ```StaticGraph``` implementor
+    fn from_graph<G: StaticGraph>(graph: &G) -> Self {
         let mut g = Self::with_capacity(graph.vertices().count());
         for (u,v) in graph.edges() {
             g.add_edge(u,v);

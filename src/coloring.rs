@@ -1,5 +1,5 @@
 use std::collections::{ HashMap, HashSet, VecDeque };
-use graph::Graph;
+use graph::StaticGraph;
 
 /// Coloring type.
 /// This maps from vertices to colors.
@@ -15,7 +15,7 @@ pub enum ColoringAlgo {
 }
 
 /// Color using the specified coloring heuristic.
-pub fn color<G: Graph>(graph: &G, col: ColoringAlgo) -> Coloring {
+pub fn color<G: StaticGraph>(graph: &G, col: ColoringAlgo) -> Coloring {
     match col {
         ColoringAlgo::RS => rs_coloring(graph),
         ColoringAlgo::CS => cs_coloring(graph),
@@ -25,7 +25,7 @@ pub fn color<G: Graph>(graph: &G, col: ColoringAlgo) -> Coloring {
 }
 
 /// Check whether coloring defines a color for all vertices that exist in the graph.
-pub fn compatible_coloring<G: Graph>(graph: &G, coloring: &Coloring) -> bool {
+pub fn compatible_coloring<G: StaticGraph>(graph: &G, coloring: &Coloring) -> bool {
     for u in graph.vertices() {
         if !coloring.contains_key(&u) {
             return false;
@@ -38,7 +38,7 @@ pub fn compatible_coloring<G: Graph>(graph: &G, coloring: &Coloring) -> bool {
 /// Check whether no adjacent vertices are in conflict.
 /// ```false``` indicates either a color conflict or no color defined for at least
 /// one of the vertices in the graph.
-pub fn check_coloring<G: Graph>(graph: &G, coloring: &Coloring) -> bool {
+pub fn check_coloring<G: StaticGraph>(graph: &G, coloring: &Coloring) -> bool {
     if !compatible_coloring(graph, coloring) {
         return false;
     }
@@ -65,7 +65,7 @@ pub fn num_colors(coloring: &Coloring) -> usize {
 
 /// Returns a 2-coloring of the graph if it exists, ```None``` otherwise.
 /// Can be used as a check for bipartiteness.
-pub fn two_coloring<G: Graph>(graph: &G) -> Option<Coloring> {
+pub fn two_coloring<G: StaticGraph>(graph: &G) -> Option<Coloring> {
     let mut c = Coloring::new();
     let mut q = VecDeque::new();
 
@@ -96,7 +96,7 @@ pub fn two_coloring<G: Graph>(graph: &G) -> Option<Coloring> {
 /// Greedy coloring algorithm.
 /// Colors the vertices in the sequence provided by chosing the
 /// smallest color not in conflict.
-pub fn greedy_coloring<G: Graph>(graph: &G, vertices: impl Iterator<Item=usize>) -> Coloring {
+pub fn greedy_coloring<G: StaticGraph>(graph: &G, vertices: impl Iterator<Item=usize>) -> Coloring {
     // Must be equal to 'vertices.count()'
     // as 'vertices' must be permutation of 'graph.vertices'
     let n = graph.vertices().count();
@@ -125,7 +125,7 @@ pub fn greedy_coloring<G: Graph>(graph: &G, vertices: impl Iterator<Item=usize>)
 /// Returns a random-sequence greedy coloring of the graph where the vertices have
 /// been colored in random order.
 /// There is no guarantee about the number of colors used.
-pub fn rs_coloring<G: Graph>(graph: &G) -> Coloring {
+pub fn rs_coloring<G: StaticGraph>(graph: &G) -> Coloring {
     // No sequence building stage for this algorithm
     // 'graph.vertices()' returns random order as it's implemented as HashSet
     greedy_coloring(graph, graph.vertices())
@@ -134,7 +134,7 @@ pub fn rs_coloring<G: Graph>(graph: &G) -> Coloring {
 /// Returns a connected-sequence greedy coloring of the graph where the vertices have
 /// been colored in an order such that each vertex (except the first) has atleast one
 /// neighbor that has already been colored.
-pub fn cs_coloring<G: Graph>(graph: &G) -> Coloring {
+pub fn cs_coloring<G: StaticGraph>(graph: &G) -> Coloring {
     // Sequence building stage
     let mut visited = HashSet::new();
     let mut vec: Vec<usize> = Vec::new();
@@ -162,7 +162,7 @@ pub fn cs_coloring<G: Graph>(graph: &G) -> Coloring {
 /// Returns a largest-first greedy coloring of the graph attained by greedily coloring
 /// the vertices in order of decreasing degree.
 /// There is no guarantee about the number of colors used.
-pub fn lf_coloring<G: Graph>(graph: &G) -> Coloring {
+pub fn lf_coloring<G: StaticGraph>(graph: &G) -> Coloring {
     // Sequence building stage
     let mut vertices: Vec<(usize, usize)> = graph.vertices().map(|u| (u, 0)).collect();
 
@@ -178,7 +178,7 @@ pub fn lf_coloring<G: Graph>(graph: &G) -> Coloring {
 /// Returns a smallest-last greedy coloring of the graph.
 /// This algorithm optimally colors trees, cycles and other types of graphs.
 /// For general graphs there is no guarantee about the number of colors used.
-pub fn sl_coloring<G: Graph>(graph: &G) -> Coloring {
+pub fn sl_coloring<G: StaticGraph>(graph: &G) -> Coloring {
     // Sequence building stage
     // Inefficient implementation
     let mut k = Vec::new();

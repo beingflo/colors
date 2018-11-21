@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use itertools::Itertools;
 
-use graph::Graph;
+use graph::StaticGraph;
 
 pub struct AdjList {
     adj: Vec<Vec<usize>>,
@@ -14,7 +14,7 @@ impl AdjList {
     }
 }
 
-impl Graph for AdjList {
+impl StaticGraph for AdjList {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(n: usize) -> Self {
         let mut adj = vec![];
@@ -25,8 +25,8 @@ impl Graph for AdjList {
         Self { adj, vertices: HashSet::new() }
     }
 
-    /// Construct an instance of this type from another ```Graph``` implementor
-    fn from_graph<G: Graph>(graph: &G) -> Self {
+    /// Construct an instance of this type from another ```StaticGraph``` implementor
+    fn from_graph<G: StaticGraph>(graph: &G) -> Self {
         let mut g = Self::new();
         for (u,v) in graph.edges() {
             g.add_edge(u,v);

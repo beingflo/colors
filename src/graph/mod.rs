@@ -10,12 +10,18 @@ pub use self::adjmatrix::AdjMatrix;
 pub use self::growableadjmatrix::GrowableAdjMatrix;
 pub use self::adjlist::AdjList;
 
-pub trait Graph: Sized {
+/// The trait to be implemented by any graph datastructure.
+/// This requires that graphs can be instantiated with a given capacity
+/// and adding edges must work properly if the vertices of the edge are within
+/// the capacity of the graph.
+/// Implementations may however dynamically grow the graph when an edge with large
+/// vertices is added.
+pub trait StaticGraph: Sized {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(n: usize) -> Self;
 
-    /// Construct an instance of this type from another ```Graph``` implementor
-    fn from_graph<G: Graph>(&G) -> Self;
+    /// Construct an instance of this type from another ```StaticGraph``` implementor
+    fn from_graph<G: StaticGraph>(&G) -> Self;
 
     /// Queries whether an edge exists in the graph.
     fn has_edge(&self, u: usize, v: usize) -> bool;
@@ -126,11 +132,11 @@ mod tests {
 
     // Tester
 
-    struct GraphTester<G: Graph> {
+    struct GraphTester<G: StaticGraph> {
         _dummy: G,
     }
 
-    impl<G: Graph> GraphTester<G> {
+    impl<G: StaticGraph> GraphTester<G> {
         fn new() -> Self {
             Self { _dummy: G::with_capacity(0) }
         }
@@ -342,12 +348,12 @@ mod tests {
 
     // Graph Interoperability tester
 
-    struct GraphInteropTester<G1: Graph, G2: Graph> {
+    struct GraphInteropTester<G1: StaticGraph, G2: StaticGraph> {
         _dummy1: G1,
         _dummy2: G2,
     }
 
-    impl<G1: Graph, G2: Graph> GraphInteropTester<G1, G2> {
+    impl<G1: StaticGraph, G2: StaticGraph> GraphInteropTester<G1, G2> {
         fn new() -> Self {
             Self { _dummy1: G1::with_capacity(0), _dummy2: G2::with_capacity(0) }
         }
