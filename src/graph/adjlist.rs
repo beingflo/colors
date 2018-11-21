@@ -2,6 +2,7 @@ use itertools::Itertools;
 
 use graph::StaticGraph;
 
+#[derive(Debug, Clone)]
 pub struct AdjList {
     adj: Vec<Vec<usize>>,
     n: usize,
@@ -21,7 +22,7 @@ impl StaticGraph for AdjList {
             adj.push(vec![]);
         }
 
-        Self { adj, n: 0 }
+        Self { adj, n }
     }
 
     /// Construct an instance of this type from another ```StaticGraph``` implementor
@@ -88,6 +89,11 @@ impl StaticGraph for AdjList {
         } else {
             Box::new(0..self.n)
         }
+    }
+
+    /// Returns the number of vertices in the graph.
+    fn num_vertices(&self) -> usize {
+        self.n
     }
 
     /// Returns an iterator over all the neighboring vertices in the graph.

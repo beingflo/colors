@@ -82,6 +82,11 @@ impl StaticGraph for EdgeList {
         }
     }
 
+    /// Returns the number of vertices in the graph.
+    fn num_vertices(&self) -> usize {
+        self.n
+    }
+
     /// Returns an iterator over all the neighboring vertices in the graph.
     fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
         Box::new(self.edges().filter(move |(a,b)| *a == v || *b == v).map(move |(a,b)| {

@@ -2,6 +2,7 @@ mod edgelist;
 mod adjmatrix;
 mod growableadjmatrix;
 mod adjlist;
+mod hybrid;
 
 use rand::random;
 
@@ -9,6 +10,7 @@ pub use self::edgelist::EdgeList;
 pub use self::adjmatrix::AdjMatrix;
 pub use self::growableadjmatrix::GrowableAdjMatrix;
 pub use self::adjlist::AdjList;
+pub use self::hybrid::Hybrid;
 
 pub type Graph = AdjList;
 
@@ -43,6 +45,9 @@ pub trait StaticGraph: Sized {
 
     /// Returns an iterator over all the vertices in the graph.
     fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a>;
+
+    /// Returns the number of vertices in the graph.
+    fn num_vertices(&self) -> usize;
 
     /// Returns an iterator over all the neighboring vertices in the graph.
     fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a>;
@@ -119,6 +124,12 @@ mod tests {
     }
 
     #[test]
+    fn test_hybrid() {
+        let tester = GraphTester::<Hybrid>::new();
+        tester.run();
+    }
+
+    #[test]
     fn test_el_adj() {
         let tester = GraphInteropTester::<EdgeList, AdjMatrix>::new();
         tester.run();
@@ -133,6 +144,24 @@ mod tests {
     #[test]
     fn test_adj_gadj() {
         let tester = GraphInteropTester::<AdjMatrix, GrowableAdjMatrix>::new();
+        tester.run();
+    }
+
+    #[test]
+    fn test_hybrid_el() {
+        let tester = GraphInteropTester::<Hybrid, EdgeList>::new();
+        tester.run();
+    }
+
+    #[test]
+    fn test_hybrid_al() {
+        let tester = GraphInteropTester::<Hybrid, AdjList>::new();
+        tester.run();
+    }
+
+    #[test]
+    fn test_hybrid_am() {
+        let tester = GraphInteropTester::<Hybrid, AdjMatrix>::new();
         tester.run();
     }
 
