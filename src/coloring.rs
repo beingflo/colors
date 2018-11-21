@@ -110,7 +110,6 @@ pub fn greedy_coloring<G: StaticGraph>(graph: &G, vertices: impl Iterator<Item=u
             }
         }
 
-
         for x in 0..n {
             if !blocked_colors[x] {
                 c.insert(v, x);
@@ -238,7 +237,7 @@ mod tests {
         let mut g = EdgeList::new();
         let c = Coloring::new();
 
-        g.add_edge(1,2);
+        g.add_edge(0,1);
 
         assert!(!check_coloring(&g, &c));
         assert!(!compatible_coloring(&g, &c));
@@ -249,10 +248,10 @@ mod tests {
         let mut g = EdgeList::new();
         let mut c = Coloring::new();
 
-        g.add_edge(1,2);
+        g.add_edge(0,1);
 
-        c.insert(1, 0);
-        c.insert(2, 1);
+        c.insert(0, 0);
+        c.insert(1, 1);
 
         assert!(check_coloring(&g, &c));
     }
@@ -296,7 +295,7 @@ mod tests {
     fn rs_color() {
         let mut g = EdgeList::new();
 
-        g.add_edge(1,2);
+        g.add_edge(0,1);
 
         let c = rs_coloring(&g);
 
@@ -308,8 +307,8 @@ mod tests {
     fn rs_color2() {
         let mut g = EdgeList::new();
 
-        g.add_edge(1,2);
-        g.add_edge(1,3);
+        g.add_edge(0,1);
+        g.add_edge(0,2);
 
         let c = rs_coloring(&g);
 
@@ -351,7 +350,7 @@ mod tests {
     fn cs_color() {
         let mut g = EdgeList::new();
 
-        g.add_edge(1,2);
+        g.add_edge(0,1);
 
         let c = cs_coloring(&g);
 
@@ -363,8 +362,8 @@ mod tests {
     fn cs_color2() {
         let mut g = EdgeList::new();
 
-        g.add_edge(1,2);
-        g.add_edge(1,3);
+        g.add_edge(0,1);
+        g.add_edge(0,2);
 
         let c = cs_coloring(&g);
 
@@ -404,7 +403,7 @@ mod tests {
     fn lf_color() {
         let mut g = EdgeList::new();
 
-        g.add_edge(1,2);
+        g.add_edge(0,1);
 
         let c = lf_coloring(&g);
 
@@ -416,8 +415,8 @@ mod tests {
     fn lf_color2() {
         let mut g = EdgeList::new();
 
-        g.add_edge(1,2);
-        g.add_edge(1,3);
+        g.add_edge(0,1);
+        g.add_edge(0,2);
 
         let c = lf_coloring(&g);
 
@@ -459,7 +458,7 @@ mod tests {
     fn sl_color() {
         let mut g = EdgeList::new();
 
-        g.add_edge(1,2);
+        g.add_edge(0,1);
 
         let c = sl_coloring(&g);
 
@@ -471,8 +470,8 @@ mod tests {
     fn sl_color2() {
         let mut g = EdgeList::new();
 
-        g.add_edge(1,2);
-        g.add_edge(1,3);
+        g.add_edge(0,1);
+        g.add_edge(0,2);
 
         let c = sl_coloring(&g);
 
@@ -605,15 +604,15 @@ mod tests {
         // Smallest slightly hard to color graph for SL
         let mut g = EdgeList::new();
 
+        g.add_edge(0,1);
+        g.add_edge(0,2);
         g.add_edge(1,2);
-        g.add_edge(1,3);
-        g.add_edge(2,3);
+        g.add_edge(0,3);
         g.add_edge(1,4);
         g.add_edge(2,5);
-        g.add_edge(3,6);
+        g.add_edge(3,4);
+        g.add_edge(3,5);
         g.add_edge(4,5);
-        g.add_edge(4,6);
-        g.add_edge(5,6);
 
         let c = rs_coloring(&g);
         let c1 = lf_coloring(&g);
@@ -636,7 +635,7 @@ mod tests {
     fn two_color() {
         let mut g = EdgeList::new();
 
-        g.add_edge(1,2);
+        g.add_edge(0,1);
 
         let c = two_coloring(&g);
 
@@ -651,8 +650,8 @@ mod tests {
     fn two_color2() {
         let mut g = EdgeList::new();
 
-        g.add_edge(1,2);
-        g.add_edge(1,3);
+        g.add_edge(0,1);
+        g.add_edge(0,2);
 
         let c = two_coloring(&g);
 
