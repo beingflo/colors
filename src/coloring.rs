@@ -309,7 +309,7 @@ mod tests {
 
     #[test]
     fn coloring_creation_empty() {
-        let g = EdgeList::new();
+        let g = AdjList::new();
         let c = Coloring::new();
 
         assert!(check_coloring(&g, &c));
@@ -317,7 +317,7 @@ mod tests {
 
     #[test]
     fn coloring_creation_fail() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
         let c = Coloring::new();
 
         g.add_edge(0,1);
@@ -328,7 +328,7 @@ mod tests {
 
     #[test]
     fn coloring_creation_success() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
 
@@ -340,7 +340,7 @@ mod tests {
     #[test]
     fn coloring_creation_large() {
         let n = 100;
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
         let mut c = vec![0; n];
 
         for u in 0..n {
@@ -376,7 +376,7 @@ mod tests {
 
     #[test]
     fn rs_color() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
 
@@ -388,7 +388,7 @@ mod tests {
 
     #[test]
     fn rs_color2() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
         g.add_edge(0,2);
@@ -401,7 +401,7 @@ mod tests {
 
     #[test]
     fn rs_line() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         for i in 0..10 {
             g.add_edge(i, i+1);
@@ -419,7 +419,7 @@ mod tests {
 
     #[test]
     fn rs_random() {
-        let g = EdgeList::random(100, 0.5);
+        let g = AdjList::random(100, 0.5);
 
         let c = rs_coloring(&g);
 
@@ -431,7 +431,7 @@ mod tests {
 
     #[test]
     fn cs_color() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
 
@@ -443,7 +443,7 @@ mod tests {
 
     #[test]
     fn cs_color2() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
         g.add_edge(0,2);
@@ -456,7 +456,7 @@ mod tests {
 
     #[test]
     fn cs_line() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         for i in 0..10 {
             g.add_edge(i, i+1);
@@ -472,7 +472,7 @@ mod tests {
 
     #[test]
     fn cs_random() {
-        let g = EdgeList::random(100, 0.5);
+        let g = AdjList::random(100, 0.5);
 
         let c = cs_coloring(&g);
 
@@ -484,7 +484,7 @@ mod tests {
 
     #[test]
     fn lf_color() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
 
@@ -496,7 +496,7 @@ mod tests {
 
     #[test]
     fn lf_color2() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
         g.add_edge(0,2);
@@ -509,7 +509,7 @@ mod tests {
 
     #[test]
     fn lf_line() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         for i in 0..10 {
             g.add_edge(i, i+1);
@@ -527,7 +527,7 @@ mod tests {
 
     #[test]
     fn lf_random() {
-        let g = EdgeList::random(100, 0.5);
+        let g = AdjList::random(100, 0.5);
 
         let c = lf_coloring(&g);
 
@@ -539,7 +539,7 @@ mod tests {
 
     #[test]
     fn sl_color() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
 
@@ -551,7 +551,7 @@ mod tests {
 
     #[test]
     fn sl_color2() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
         g.add_edge(0,2);
@@ -564,7 +564,7 @@ mod tests {
 
     #[test]
     fn sl_line() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         for i in 0..10 {
             g.add_edge(i, i+1);
@@ -580,7 +580,7 @@ mod tests {
 
     #[test]
     fn sl_random() {
-        let g = EdgeList::random(100, 0.5);
+        let g = AdjList::random(100, 0.5);
 
         let c = sl_coloring(&g);
 
@@ -592,7 +592,7 @@ mod tests {
 
     #[test]
     fn sdo_color() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
 
@@ -604,7 +604,7 @@ mod tests {
 
     #[test]
     fn sdo_color2() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
         g.add_edge(0,2);
@@ -617,7 +617,7 @@ mod tests {
 
     #[test]
     fn sdo_line() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         for i in 0..10 {
             g.add_edge(i, i+1);
@@ -635,7 +635,7 @@ mod tests {
 
     #[test]
     fn sdo_random() {
-        let g = EdgeList::random(100, 0.5);
+        let g = AdjList::random(100, 0.5);
 
         let c = sdo_coloring(&g);
 
@@ -647,7 +647,7 @@ mod tests {
 
     #[test]
     fn tree_coloring() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         // Binary tree
         for i in 0..127 {
@@ -679,7 +679,7 @@ mod tests {
 
     #[test]
     fn even_cycle_coloring() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         // even cycle
         let n = 128;
@@ -715,7 +715,7 @@ mod tests {
 
     #[test]
     fn odd_cycle_coloring() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         // odd cycle
         let n = 127;
@@ -749,7 +749,7 @@ mod tests {
     #[test]
     fn prism_coloring() {
         // Smallest slightly hard to color graph for SL
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
         g.add_edge(0,2);
@@ -788,7 +788,7 @@ mod tests {
 
     #[test]
     fn two_color() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
 
@@ -803,7 +803,7 @@ mod tests {
 
     #[test]
     fn two_color2() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0,1);
         g.add_edge(0,2);
@@ -819,7 +819,7 @@ mod tests {
 
     #[test]
     fn two_line() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         for i in 0..10 {
             g.add_edge(i, i+1);
@@ -838,7 +838,7 @@ mod tests {
 
     #[test]
     fn two_fail() {
-        let mut g = EdgeList::new();
+        let mut g = AdjList::new();
 
         g.add_edge(0, 1);
         g.add_edge(1, 2);
@@ -851,7 +851,7 @@ mod tests {
 
     #[test]
     fn random_coloring() {
-        let g1 = EdgeList::random(100, 0.5);
+        let g1 = AdjList::random(100, 0.5);
         let g2 = AdjMatrix::random(100, 0.5);
 
         let c = rs_coloring(&g1);
