@@ -100,6 +100,22 @@ pub trait StaticGraph: Sized {
 
 }
 
+/// Load a graph from file in DIMACS ```.col``` format. ([Specification](http://lcs.ios.ac.cn/~caisw/Resource/about_DIMACS_graph_format.txt))
+///
+/// A line may starting with ```c```, ```p``` or ```e```.
+/// ```c``` indicates a comment line and is ignored.
+/// ```p``` lists the parameters of the graph as such:
+/// ```p edge n m```
+/// where edge is simply written out, indicating that the following lines will each encode an edge,
+/// n is the number of vertices in the graph and m is the number of edges.
+/// This line must appear before any ```e``` lines.
+/// Lastly, ```e``` lines appear as:
+/// ```e u v```
+/// where u and v are vertex ids in [1,n] (n inclusive).
+pub fn load_graph<G: StaticGraph>() -> G {
+    G::with_capacity(0)
+}
+
 
 #[cfg(test)]
 mod tests {
