@@ -301,6 +301,54 @@ pub fn sdo_coloring<G: StaticGraph>(graph: &G) -> Coloring {
     coloring
 }
 
+fn fix_coloring<G: StaticGraph>(g: &G, c: &mut Coloring) {
+    for (u,v) in g.edges() {
+        // Conflict
+        if c[u] == c[v] {
+            let u_colors = g.neighbors(u).map(|x| c[x]).collect::<HashSet<usize>>();
+            let v_colors = g.neighbors(v).map(|x| c[x]).collect::<HashSet<usize>>();
+
+            let mut min_u_color = g.num_vertices();
+            let mut min_v_color = g.num_vertices();
+            for x in 0..g.num_vertices() {
+                if !u_colors.contains(&x) {
+                    min_u_color = x;
+                    break;
+                }
+            }
+            for x in 0..g.num_vertices() {
+                if !v_colors.contains(&x) {
+                    min_v_color = x;
+                    break;
+                }
+            }
+
+            if min_u_color < min_v_color {
+                c[u] = min_u_color;
+            } else {
+                c[v] = min_v_color;
+            }
+        }
+    }
+}
+
+pub fn genetic_coloring<G: StaticGraph>(g: &G) -> Coloring {
+    let n = 100;
+    let gen = 100;
+    let mut solutions: Vec<Vec<usize>> = Vec::new();
+
+    // Random initialization
+    for _ in 0..n {
+        solutions.push(sl_coloring(g));
+    }
+
+    //for _ in 0..gen {
+        solutions.sort_by(|a, b| num_colors(a).cmp(&num_colors(b)));
+    //}
+
+    solutions.remove(0)
+}
+
 
 #[cfg(test)]
 mod tests {
