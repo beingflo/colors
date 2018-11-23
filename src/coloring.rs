@@ -1,4 +1,6 @@
 use std::collections::{ HashSet, VecDeque };
+use rand::random;
+
 use graph::StaticGraph;
 
 /// Coloring type.
@@ -301,6 +303,20 @@ pub fn sdo_coloring<G: StaticGraph>(graph: &G) -> Coloring {
     coloring
 }
 
+pub fn repeat_coloring<G: StaticGraph>(g: &G, c: fn(&G) -> Coloring, n: usize) -> Coloring {
+    let mut colorings: Vec<Coloring> = Vec::new();
+
+    // Random initialization
+    for _ in 0..n {
+        colorings.push(c(g));
+    }
+
+    colorings.into_iter().map(|c| {
+        assert!(check_coloring(g, &c));
+        c
+    }).min_by_key(|c| num_colors(&c)).unwrap()
+}
+
 fn fix_coloring<G: StaticGraph>(g: &G, c: &mut Coloring) {
     for (u,v) in g.edges() {
         // Conflict
@@ -335,18 +351,36 @@ fn fix_coloring<G: StaticGraph>(g: &G, c: &mut Coloring) {
 pub fn genetic_coloring<G: StaticGraph>(g: &G) -> Coloring {
     let n = 100;
     let gen = 100;
-    let mut solutions: Vec<Vec<usize>> = Vec::new();
+    let n_vert = g.num_vertices();
+    let mut colorings: Vec<Coloring> = Vec::new();
 
     // Random initialization
     for _ in 0..n {
-        solutions.push(sl_coloring(g));
+        colorings.push(sl_coloring(g));
     }
 
-    //for _ in 0..gen {
-        solutions.sort_by(|a, b| num_colors(a).cmp(&num_colors(b)));
-    //}
+    for _ in 0..gen {
+        colorings.sort_by(|a, b| num_colors(a).cmp(&num_colors(b)));
 
-    solutions.remove(0)
+        for i in n/2..n {
+            let mom = random::<usize>() % (n/2);
+            let dad = random::<usize>() % (n/2);
+
+            let split = random::<usize>() % n_vert;
+
+            for j in 0..n_vert {
+                if j < split {
+                    colorings[i][j] = colorings[mom][j];
+                } else {
+                    colorings[i][j] = colorings[dad][j];
+                }
+            }
+
+            fix_coloring(g, &mut colorings[i]);
+        }
+    }
+
+    colorings.remove(0)
 }
 
 
