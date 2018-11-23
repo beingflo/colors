@@ -2,21 +2,59 @@ extern crate graml;
 extern crate num_cpus;
 
 use std::thread;
+use std::env;
 use std::sync::mpsc;
 
 use graml::graph::*;
 use graml::coloring::*;
 
 fn main() {
-    // Run comparison on this many graphs
-    let samples = 50;
+    let args = env::args().collect::<Vec<String>>();
+    if args.len() == 1 {
+        // Run comparison on this many graphs
+        let samples = 50;
 
-    // Number of vertices in each sample graph
-    let n = 200;
+        // Number of vertices in each sample graph
+        let n = 200;
 
-    // Edge probability in each sample graph
-    let p = 0.9;
+        // Edge probability in each sample graph
+        let p = 0.9;
 
+        comparison(samples, n, p);
+    } else {
+        let file = &args[1];
+        let g = load_graph(file).unwrap();
+
+        println!("Graph from file with {} vertices\n", g.num_vertices());
+
+        // Perform colorings
+        let c1 = rs_coloring(&g);
+        let c2 = cs_coloring(&g);
+        let c3 = lf_coloring(&g);
+        let c4 = sl_coloring(&g);
+        let c5 = sdo_coloring(&g);
+
+        // Check colorings
+        assert!(check_coloring(&g, &c1));
+        assert!(check_coloring(&g, &c2));
+        assert!(check_coloring(&g, &c3));
+        assert!(check_coloring(&g, &c4));
+        assert!(check_coloring(&g, &c5));
+
+        // Count number of colors used
+        let n1 = num_colors(&c1);
+        let n2 = num_colors(&c2);
+        let n3 = num_colors(&c3);
+        let n4 = num_colors(&c4);
+        let n5 = num_colors(&c5);
+
+        println!("rs\tcs\tlf\tsl\tsdo\n");
+
+        println!("{}\t{}\t{}\t{}\t{}", n1, n2, n3, n4, n5);
+    }
+}
+
+fn comparison(samples: usize, n: usize, p: f32) {
     // Number of processors
     let workers = num_cpus::get();
 

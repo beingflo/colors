@@ -4,6 +4,9 @@ mod growableadjmatrix;
 mod adjlist;
 mod hybrid;
 
+use std::path::Path;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 use rand::random;
 
 pub use self::edgelist::EdgeList;
@@ -112,8 +115,48 @@ pub trait StaticGraph: Sized {
 /// Lastly, ```e``` lines appear as:
 /// ```e u v```
 /// where u and v are vertex ids in [1,n] (n inclusive).
-pub fn load_graph<G: StaticGraph>() -> G {
-    G::with_capacity(0)
+pub fn load_graph(name: impl AsRef<Path>) -> std::io::Result<Graph> {
+    let file = File::open(name)?;
+    let mut graph = None;
+
+    for line in BufReader::new(file).lines() {
+        // Should always be valid UTF-8
+        let line = line.unwrap();
+
+        if line.starts_with('c') {
+            continue;
+        }
+
+        if line.starts_with('p') {
+            let splits = line.split(" ").collect::<Vec<_>>();
+            //assert_eq!(splits[1], "edge".to_string());
+
+            let n = splits[2].parse::<usize>().unwrap();
+            let _m = splits[3].parse::<usize>().unwrap();
+
+            graph = Some(Graph::with_capacity(n));
+            continue;
+        }
+
+        if line.starts_with('e') {
+            let splits = line.split(" ").collect::<Vec<_>>();
+            let u = splits[1].parse::<usize>().unwrap();
+            let v = splits[2].parse::<usize>().unwrap();
+
+            // Shift everything down as vertices are in [1,n]
+            if let Some(ref mut graph) = graph {
+                graph.add_edge(u-1, v-1);
+            } else {
+                panic!("'e' line before 'p' line");
+            }
+
+            continue;
+        }
+
+        panic!("Unexpected line '{}'", line);
+    }
+
+    Ok(graph.unwrap())
 }
 
 
