@@ -3,6 +3,8 @@ extern crate num_cpus;
 
 use std::thread;
 use std::env;
+use std::fs;
+use std::path::Path;
 use std::sync::mpsc;
 
 use graml::graph::*;
@@ -22,35 +24,34 @@ fn main() {
 
         comparison(samples, n, p);
     } else {
-        let file = &args[1];
-        let g = load_graph(file).unwrap();
+        let path = &args[1];
+        let meta = fs::metadata(path).unwrap();
 
-        println!("Graph from file with {} vertices\n", g.num_vertices());
+        if meta.is_dir() {
+            // Handle all the graphs
+            for file in fs::read_dir(path).unwrap() {
+                let file = file.unwrap().path();
+                let g = load_graph(file.clone()).unwrap();
 
-        // Perform colorings
-        let c1 = rs_coloring(&g);
-        let c2 = cs_coloring(&g);
-        let c3 = lf_coloring(&g);
-        let c4 = sl_coloring(&g);
-        let c5 = sdo_coloring(&g);
+                println!("Graph {} with {} vertices\n", file.file_name().unwrap().to_str().unwrap(), g.num_vertices());
 
-        // Check colorings
-        assert!(check_coloring(&g, &c1));
-        assert!(check_coloring(&g, &c2));
-        assert!(check_coloring(&g, &c3));
-        assert!(check_coloring(&g, &c4));
-        assert!(check_coloring(&g, &c5));
+                let (n1, n2, n3, n4, n5) = all_colorings(&g);
 
-        // Count number of colors used
-        let n1 = num_colors(&c1);
-        let n2 = num_colors(&c2);
-        let n3 = num_colors(&c3);
-        let n4 = num_colors(&c4);
-        let n5 = num_colors(&c5);
+                println!("rs\tcs\tlf\tsl\tsdo");
+                println!("{}\t{}\t{}\t{}\t{}\n", n1, n2, n3, n4, n5);
+            }
+        } else {
+            let file = Path::new(path);
+            let g = load_graph(file.clone()).unwrap();
 
-        println!("rs\tcs\tlf\tsl\tsdo\n");
+            println!("Graph {} with {} vertices\n", file.file_name().unwrap().to_str().unwrap(), g.num_vertices());
 
-        println!("{}\t{}\t{}\t{}\t{}", n1, n2, n3, n4, n5);
+            let (n1, n2, n3, n4, n5) = all_colorings(&g);
+
+            println!("rs\tcs\tlf\tsl\tsdo\n");
+            println!("{}\t{}\t{}\t{}\t{}", n1, n2, n3, n4, n5);
+
+        }
     }
 }
 
@@ -78,29 +79,10 @@ fn comparison(samples: usize, n: usize, p: f32) {
                 // Create new graph
                 let g = Graph::random(n, p);
 
-                // Perform colorings
-                let c1 = rs_coloring(&g);
-                let c2 = cs_coloring(&g);
-                let c3 = lf_coloring(&g);
-                let c4 = sl_coloring(&g);
-                let c5 = sdo_coloring(&g);
-
-                // Check colorings
-                assert!(check_coloring(&g, &c1));
-                assert!(check_coloring(&g, &c2));
-                assert!(check_coloring(&g, &c3));
-                assert!(check_coloring(&g, &c4));
-                assert!(check_coloring(&g, &c5));
-
-                // Count number of colors used
-                let n1 = num_colors(&c1);
-                let n2 = num_colors(&c2);
-                let n3 = num_colors(&c3);
-                let n4 = num_colors(&c4);
-                let n5 = num_colors(&c5);
+                let c = all_colorings(&g);
 
                 // Send to main thread
-                tx_.send((n1,n2,n3,n4,n5)).unwrap();
+                tx_.send(c).unwrap();
             }
         });
     }
@@ -129,4 +111,29 @@ fn comparison(samples: usize, n: usize, p: f32) {
     println!("\n{}\t{}\t{}\t{}\t{}", sum[0] as f32/samples as f32,
              sum[1] as f32/samples as f32, sum[2] as f32/samples as f32,
              sum[3] as f32/samples as f32, sum[4] as f32/samples as f32);
+}
+
+fn all_colorings<G: StaticGraph>(g: &G) -> (usize, usize, usize, usize, usize) {
+    // Perform colorings
+    let c1 = rs_coloring(g);
+    let c2 = cs_coloring(g);
+    let c3 = lf_coloring(g);
+    let c4 = sl_coloring(g);
+    let c5 = sdo_coloring(g);
+
+    // Check colorings
+    assert!(check_coloring(g, &c1));
+    assert!(check_coloring(g, &c2));
+    assert!(check_coloring(g, &c3));
+    assert!(check_coloring(g, &c4));
+    assert!(check_coloring(g, &c5));
+
+    // Count number of colors used
+    let n1 = num_colors(&c1);
+    let n2 = num_colors(&c2);
+    let n3 = num_colors(&c3);
+    let n4 = num_colors(&c4);
+    let n5 = num_colors(&c5);
+
+    (n1, n2, n3, n4, n5)
 }
