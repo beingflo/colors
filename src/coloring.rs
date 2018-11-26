@@ -312,7 +312,7 @@ pub fn repeat_coloring<G: StaticGraph>(g: &G, c: fn(&G) -> Coloring, n: usize) -
 
     for _ in 1..n {
         let new_c = c(g);
-        let nc_new_c = num_colors(&best_c);
+        let nc_new_c = num_colors(&new_c);
         if nc_new_c < nc_best_c {
             best_c = new_c;
             nc_best_c = nc_new_c;
