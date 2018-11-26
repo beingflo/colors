@@ -1,5 +1,5 @@
-extern crate rand;
 extern crate itertools;
+extern crate rand;
 
-pub mod graph;
 pub mod coloring;
+pub mod graph;

@@ -1,5 +1,5 @@
-use std::collections::{ HashSet, VecDeque };
 use rand::random;
+use std::collections::{HashSet, VecDeque};
 
 use graph::StaticGraph;
 
@@ -26,10 +26,14 @@ pub fn color<G: StaticGraph>(graph: &G) -> Coloring {
     colorings.push(sl_coloring(graph));
     colorings.push(sdo_coloring(graph));
 
-    colorings.into_iter().map(|c| {
-        assert!(check_coloring(graph, &c));
-        c
-    }).min_by_key(|c| num_colors(&c)).unwrap()
+    colorings
+        .into_iter()
+        .map(|c| {
+            assert!(check_coloring(graph, &c));
+            c
+        })
+        .min_by_key(|c| num_colors(&c))
+        .unwrap()
 }
 
 /// Check whether coloring defines a color for all vertices that exist in the graph.
@@ -49,7 +53,7 @@ pub fn check_coloring<G: StaticGraph>(graph: &G, coloring: &Coloring) -> bool {
         return false;
     }
 
-    for (u,v) in graph.edges() {
+    for (u, v) in graph.edges() {
         if coloring[u] == coloring[v] {
             return false;
         }
@@ -90,7 +94,7 @@ pub fn two_coloring<G: StaticGraph>(graph: &G) -> Option<Coloring> {
                 }
             } else {
                 // Color neighbors opposite color and put in the frontier
-                c[u] = Some(1-color);
+                c[u] = Some(1 - color);
                 q.push_back(u);
             }
         }
@@ -113,7 +117,10 @@ pub fn two_coloring<G: StaticGraph>(graph: &G) -> Option<Coloring> {
 /// Greedy coloring algorithm.
 /// Colors the vertices in the sequence provided by chosing the
 /// smallest color not in conflict.
-pub fn greedy_coloring<G: StaticGraph>(graph: &G, vertices: impl Iterator<Item=usize>) -> Coloring {
+pub fn greedy_coloring<G: StaticGraph>(
+    graph: &G,
+    vertices: impl Iterator<Item = usize>,
+) -> Coloring {
     // Must be equal to 'vertices.count()'
     // as 'vertices' must be permutation of 'graph.vertices'
     let n = graph.num_vertices();
@@ -199,7 +206,7 @@ pub fn lf_coloring<G: StaticGraph>(graph: &G) -> Coloring {
         *d = graph.neighbors(*v).count();
     }
 
-    vertices.sort_by(|a,b| b.1.cmp(&a.1));
+    vertices.sort_by(|a, b| b.1.cmp(&a.1));
 
     greedy_coloring(graph, vertices.iter().map(|&(v, _)| v))
 }
@@ -245,7 +252,6 @@ pub fn sl_coloring<G: StaticGraph>(graph: &G) -> Coloring {
     // Greedy coloring with reversed order of k
     greedy_coloring(graph, k.iter().rev().cloned())
 }
-
 
 /// Returns a saturation degree ordered coloring of the graph.
 /// The SDO is defined by the number of distinct colors in the neighborhood -
@@ -325,7 +331,7 @@ pub fn repeat_coloring<G: StaticGraph>(g: &G, c: fn(&G) -> Coloring, n: usize) -
 /// Fixes a potentially wrong coloring by choosing the lowest available color
 /// for the vertex with lower saturation degree of any conflicting edge.
 pub fn fix_coloring<G: StaticGraph>(g: &G, c: &mut Coloring) {
-    for (u,v) in g.edges() {
+    for (u, v) in g.edges() {
         // Conflict
         if c[u] == c[v] {
             let u_colors = g.neighbors(u).map(|x| c[x]).collect::<HashSet<usize>>();
@@ -369,9 +375,9 @@ pub fn genetic_coloring<G: StaticGraph>(g: &G) -> Coloring {
     for _ in 0..gen {
         colorings.sort_by(|a, b| num_colors(a).cmp(&num_colors(b)));
 
-        for i in n/2..n {
-            let mom = random::<usize>() % (n/2);
-            let dad = random::<usize>() % (n/2);
+        for i in n / 2..n {
+            let mom = random::<usize>() % (n / 2);
+            let dad = random::<usize>() % (n / 2);
 
             let split = random::<usize>() % n_vert;
 
@@ -389,7 +395,6 @@ pub fn genetic_coloring<G: StaticGraph>(g: &G) -> Coloring {
 
     colorings.remove(0)
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -409,7 +414,7 @@ mod tests {
         let mut g = AdjList::new();
         let c = Coloring::new();
 
-        g.add_edge(0,1);
+        g.add_edge(0, 1);
 
         assert!(!check_coloring(&g, &c));
         assert!(!compatible_coloring(&g, &c));
@@ -419,7 +424,7 @@ mod tests {
     fn coloring_creation_success() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
+        g.add_edge(0, 1);
 
         let c = vec![0, 1];
 
@@ -434,7 +439,7 @@ mod tests {
 
         for u in 0..n {
             for v in u..n {
-                g.add_edge(u,v);
+                g.add_edge(u, v);
             }
         }
 
@@ -467,7 +472,7 @@ mod tests {
     fn rs_color() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
+        g.add_edge(0, 1);
 
         let c = rs_coloring(&g);
 
@@ -479,8 +484,8 @@ mod tests {
     fn rs_color2() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
-        g.add_edge(0,2);
+        g.add_edge(0, 1);
+        g.add_edge(0, 2);
 
         let c = rs_coloring(&g);
 
@@ -493,7 +498,7 @@ mod tests {
         let mut g = AdjList::new();
 
         for i in 0..10 {
-            g.add_edge(i, i+1);
+            g.add_edge(i, i + 1);
         }
 
         let c = rs_coloring(&g);
@@ -522,7 +527,7 @@ mod tests {
     fn cs_color() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
+        g.add_edge(0, 1);
 
         let c = cs_coloring(&g);
 
@@ -534,8 +539,8 @@ mod tests {
     fn cs_color2() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
-        g.add_edge(0,2);
+        g.add_edge(0, 1);
+        g.add_edge(0, 2);
 
         let c = cs_coloring(&g);
 
@@ -548,7 +553,7 @@ mod tests {
         let mut g = AdjList::new();
 
         for i in 0..10 {
-            g.add_edge(i, i+1);
+            g.add_edge(i, i + 1);
         }
 
         let c = cs_coloring(&g);
@@ -575,7 +580,7 @@ mod tests {
     fn lf_color() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
+        g.add_edge(0, 1);
 
         let c = lf_coloring(&g);
 
@@ -587,8 +592,8 @@ mod tests {
     fn lf_color2() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
-        g.add_edge(0,2);
+        g.add_edge(0, 1);
+        g.add_edge(0, 2);
 
         let c = lf_coloring(&g);
 
@@ -601,7 +606,7 @@ mod tests {
         let mut g = AdjList::new();
 
         for i in 0..10 {
-            g.add_edge(i, i+1);
+            g.add_edge(i, i + 1);
         }
 
         let c = lf_coloring(&g);
@@ -630,7 +635,7 @@ mod tests {
     fn sl_color() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
+        g.add_edge(0, 1);
 
         let c = sl_coloring(&g);
 
@@ -642,8 +647,8 @@ mod tests {
     fn sl_color2() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
-        g.add_edge(0,2);
+        g.add_edge(0, 1);
+        g.add_edge(0, 2);
 
         let c = sl_coloring(&g);
 
@@ -656,7 +661,7 @@ mod tests {
         let mut g = AdjList::new();
 
         for i in 0..10 {
-            g.add_edge(i, i+1);
+            g.add_edge(i, i + 1);
         }
 
         let c = sl_coloring(&g);
@@ -683,7 +688,7 @@ mod tests {
     fn sdo_color() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
+        g.add_edge(0, 1);
 
         let c = sdo_coloring(&g);
 
@@ -695,8 +700,8 @@ mod tests {
     fn sdo_color2() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
-        g.add_edge(0,2);
+        g.add_edge(0, 1);
+        g.add_edge(0, 2);
 
         let c = sdo_coloring(&g);
 
@@ -709,7 +714,7 @@ mod tests {
         let mut g = AdjList::new();
 
         for i in 0..10 {
-            g.add_edge(i, i+1);
+            g.add_edge(i, i + 1);
         }
 
         let c = sdo_coloring(&g);
@@ -740,8 +745,8 @@ mod tests {
 
         // Binary tree
         for i in 0..127 {
-            g.add_edge(i, 2*i+1);
-            g.add_edge(i, 2*i+2);
+            g.add_edge(i, 2 * i + 1);
+            g.add_edge(i, 2 * i + 2);
         }
 
         let c = rs_coloring(&g);
@@ -773,7 +778,7 @@ mod tests {
         // even cycle
         let n = 128;
         for i in 0..n {
-            g.add_edge(i, (i+1)%n);
+            g.add_edge(i, (i + 1) % n);
         }
 
         let c = rs_coloring(&g);
@@ -809,7 +814,7 @@ mod tests {
         // odd cycle
         let n = 127;
         for i in 0..n {
-            g.add_edge(i, (i+1)%n);
+            g.add_edge(i, (i + 1) % n);
         }
 
         let c = rs_coloring(&g);
@@ -840,15 +845,15 @@ mod tests {
         // Smallest slightly hard to color graph for SL
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
-        g.add_edge(0,2);
-        g.add_edge(1,2);
-        g.add_edge(0,3);
-        g.add_edge(1,4);
-        g.add_edge(2,5);
-        g.add_edge(3,4);
-        g.add_edge(3,5);
-        g.add_edge(4,5);
+        g.add_edge(0, 1);
+        g.add_edge(0, 2);
+        g.add_edge(1, 2);
+        g.add_edge(0, 3);
+        g.add_edge(1, 4);
+        g.add_edge(2, 5);
+        g.add_edge(3, 4);
+        g.add_edge(3, 5);
+        g.add_edge(4, 5);
 
         let c = rs_coloring(&g);
         let c1 = lf_coloring(&g);
@@ -879,7 +884,7 @@ mod tests {
     fn two_color() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
+        g.add_edge(0, 1);
 
         let c = two_coloring(&g);
 
@@ -894,8 +899,8 @@ mod tests {
     fn two_color2() {
         let mut g = AdjList::new();
 
-        g.add_edge(0,1);
-        g.add_edge(0,2);
+        g.add_edge(0, 1);
+        g.add_edge(0, 2);
 
         let c = two_coloring(&g);
 
@@ -911,7 +916,7 @@ mod tests {
         let mut g = AdjList::new();
 
         for i in 0..10 {
-            g.add_edge(i, i+1);
+            g.add_edge(i, i + 1);
         }
 
         let c = two_coloring(&g);

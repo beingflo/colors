@@ -17,7 +17,10 @@ pub struct EdgeList {
 impl EdgeList {
     /// Constructs a new empty graph
     pub fn new() -> Self {
-        Self { edges: HashSet::new(), n: 0 }
+        Self {
+            edges: HashSet::new(),
+            n: 0,
+        }
     }
 }
 
@@ -25,14 +28,17 @@ impl StaticGraph for EdgeList {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(n: usize) -> Self {
         // Only implemented for compatibility, not very much to do here
-        Self { edges: HashSet::new(), n, }
+        Self {
+            edges: HashSet::new(),
+            n,
+        }
     }
 
     /// Construct an instance of this type from another ```StaticGraph``` implementor
     fn from_graph<G: StaticGraph>(graph: &G) -> Self {
         let mut g = Self::new();
-        for (u,v) in graph.edges() {
-            g.add_edge(u,v);
+        for (u, v) in graph.edges() {
+            g.add_edge(u, v);
         }
         g
     }
@@ -45,14 +51,14 @@ impl StaticGraph for EdgeList {
             v = t;
         }
 
-        self.edges.contains(&(u,v))
+        self.edges.contains(&(u, v))
     }
 
     /// Adds an edge to the graph.
     /// ```add_edge(u,v)``` has the same effect as ```add_edge(v,u)```
     /// as the graph captures undirected edges.
     /// Adding an edge that already exists has no effect.
-    fn add_edge(&mut self, mut u: usize, mut v: usize)  {
+    fn add_edge(&mut self, mut u: usize, mut v: usize) {
         if u == v {
             return;
         }
@@ -63,13 +69,13 @@ impl StaticGraph for EdgeList {
             v = t;
         }
 
-        self.n = self.n.max(v+1);
+        self.n = self.n.max(v + 1);
 
-        self.edges.insert((u,v));
+        self.edges.insert((u, v));
     }
 
     /// Returns an iterator over all the edges in the graph.
-    fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a> {
+    fn edges<'a>(&'a self) -> Box<Iterator<Item = (usize, usize)> + 'a> {
         Box::new(self.edges.iter().cloned())
     }
 
@@ -79,13 +85,17 @@ impl StaticGraph for EdgeList {
     }
 
     /// Returns an iterator over all the neighboring vertices in the graph.
-    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
-        Box::new(self.edges().filter(move |(a,b)| *a == v || *b == v).map(move |(a,b)| {
-            if a == v {
-                b
-            } else {
-                a
-            }
-        }))
+    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item = usize> + 'a> {
+        Box::new(
+            self.edges().filter(move |(a, b)| *a == v || *b == v).map(
+                move |(a, b)| {
+                    if a == v {
+                        b
+                    } else {
+                        a
+                    }
+                },
+            ),
+        )
     }
 }

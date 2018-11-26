@@ -33,8 +33,8 @@ impl StaticGraph for AdjList {
     /// Construct an instance of this type from another ```StaticGraph``` implementor
     fn from_graph<G: StaticGraph>(graph: &G) -> Self {
         let mut g = Self::new();
-        for (u,v) in graph.edges() {
-            g.add_edge(u,v);
+        for (u, v) in graph.edges() {
+            g.add_edge(u, v);
         }
         g
     }
@@ -63,8 +63,8 @@ impl StaticGraph for AdjList {
             return;
         }
 
-        self.n = self.n.max(u+1);
-        self.n = self.n.max(v+1);
+        self.n = self.n.max(u + 1);
+        self.n = self.n.max(v + 1);
 
         while self.adj.len() <= u {
             self.adj.push(vec![]);
@@ -74,17 +74,24 @@ impl StaticGraph for AdjList {
             self.adj.push(vec![]);
         }
 
-        if !self.has_edge(u,v) {
+        if !self.has_edge(u, v) {
             self.adj[u].push(v);
             self.adj[v].push(u);
         }
     }
 
     /// Returns an iterator over all the edges in the graph.
-    fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a> {
-        Box::new(self.adj.iter().enumerate().flat_map(|(u, vec)| vec.iter().map(move |&v| {
-            if u > v { (v,u) } else { (u,v) }
-        })).unique())
+    fn edges<'a>(&'a self) -> Box<Iterator<Item = (usize, usize)> + 'a> {
+        Box::new(
+            self.adj
+                .iter()
+                .enumerate()
+                .flat_map(|(u, vec)| {
+                    vec.iter()
+                        .map(move |&v| if u > v { (v, u) } else { (u, v) })
+                })
+                .unique(),
+        )
     }
 
     /// Returns the number of vertices in the graph.
@@ -93,12 +100,11 @@ impl StaticGraph for AdjList {
     }
 
     /// Returns an iterator over all the neighboring vertices in the graph.
-    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
+    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item = usize> + 'a> {
         if v >= self.adj.len() {
             Box::new(std::iter::empty())
         } else {
             Box::new(self.adj[v].iter().cloned())
         }
-
     }
 }

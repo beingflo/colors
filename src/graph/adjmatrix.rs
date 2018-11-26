@@ -1,5 +1,5 @@
-use std::iter::Iterator;
 use itertools::Itertools;
+use std::iter::Iterator;
 
 use graph::StaticGraph;
 
@@ -24,14 +24,17 @@ impl AdjMatrix {
 impl StaticGraph for AdjMatrix {
     /// Constructs a new graph with capacity for ```n``` vertices.
     fn with_capacity(n: usize) -> Self {
-        Self { adj: vec![false; n*n], n: n }
+        Self {
+            adj: vec![false; n * n],
+            n: n,
+        }
     }
 
     /// Construct an instance of this type from another ```StaticGraph``` implementor
     fn from_graph<G: StaticGraph>(graph: &G) -> Self {
         let mut g = Self::with_capacity(graph.vertices().count());
-        for (u,v) in graph.edges() {
-            g.add_edge(u,v);
+        for (u, v) in graph.edges() {
+            g.add_edge(u, v);
         }
         g
     }
@@ -50,7 +53,7 @@ impl StaticGraph for AdjMatrix {
     /// ```add_edge(u,v)``` has the same effect as ```add_edge(v,u)```
     /// as the graph captures undirected edges.
     /// Adding an edge that already exists has no effect.
-    fn add_edge(&mut self, u: usize, v: usize)  {
+    fn add_edge(&mut self, u: usize, v: usize) {
         // Self edges explicitly disallowed
         // If no capacity, just return
         if u == v || u >= self.n || v >= self.n {
@@ -65,14 +68,25 @@ impl StaticGraph for AdjMatrix {
     }
 
     /// Returns an iterator over all the edges in the graph.
-    fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a> {
+    fn edges<'a>(&'a self) -> Box<Iterator<Item = (usize, usize)> + 'a> {
         let n = self.n;
-        Box::new(self.adj.iter().enumerate().filter(|(_, &b)| b).map(move |(i, _)| {
-            let u = i / n;
-            let v = i % n;
+        Box::new(
+            self.adj
+                .iter()
+                .enumerate()
+                .filter(|(_, &b)| b)
+                .map(move |(i, _)| {
+                    let u = i / n;
+                    let v = i % n;
 
-            if u > v { (v,u) } else { (u,v) }
-        }).unique())
+                    if u > v {
+                        (v, u)
+                    } else {
+                        (u, v)
+                    }
+                })
+                .unique(),
+        )
     }
 
     /// Returns the number of vertices in the graph.
@@ -81,9 +95,15 @@ impl StaticGraph for AdjMatrix {
     }
 
     /// Returns an iterator over all the neighboring vertices in the graph.
-    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
+    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item = usize> + 'a> {
         if v < self.n {
-            Box::new(self.adj[(v * self.n)..((v+1) * self.n)].iter().enumerate().filter(|(_, &b)| b).map(|(i, _)| i))
+            Box::new(
+                self.adj[(v * self.n)..((v + 1) * self.n)]
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, &b)| b)
+                    .map(|(i, _)| i),
+            )
         } else {
             Box::new(std::iter::empty())
         }

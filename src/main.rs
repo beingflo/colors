@@ -1,14 +1,14 @@
+extern crate crossbeam;
 extern crate graml;
 extern crate num_cpus;
-extern crate crossbeam;
 
 use std::env;
 use std::fs;
-use std::thread;
 use std::path::Path;
+use std::thread;
 
-use graml::graph::*;
 use graml::coloring::*;
+use graml::graph::*;
 
 fn main() {
     let args = env::args().collect::<Vec<String>>();
@@ -26,8 +26,12 @@ fn main() {
         // Edge probability in each sample graph
         let p = 0.9;
 
-        graphs = (0..samples).map(move |_| Graph::random(n, p)).collect::<Vec<Graph>>();
-        names = (0..samples).map(move |_| format!("Random({},{})", n, p)).collect::<Vec<String>>();
+        graphs = (0..samples)
+            .map(move |_| Graph::random(n, p))
+            .collect::<Vec<Graph>>();
+        names = (0..samples)
+            .map(move |_| format!("Random({},{})", n, p))
+            .collect::<Vec<String>>();
     } else {
         let path = &args[1];
         let meta = fs::metadata(path).unwrap();
@@ -99,13 +103,19 @@ fn parallel_coloring<G: StaticGraph + Send + 'static>(graphs: Vec<G>, names: Vec
 
     // Print results
     let spacing = 8;
-    println!("{0:<1$}{2:>7$}{3:>7$}{4:>7$}{5:>7$}{6:>7$}\n", "", max_width, "rs", "cs", "lf", "sl", "sdo", spacing);
+    println!(
+        "{0:<1$}{2:>7$}{3:>7$}{4:>7$}{5:>7$}{6:>7$}\n",
+        "", max_width, "rs", "cs", "lf", "sl", "sdo", spacing
+    );
 
     let mut sum = [0; 5];
 
     // Iterate over all values received by worker threads
     for ((n1, n2, n3, n4, n5), name) in rx_res.iter() {
-        println!("{0:<1$}{2:>7$}{3:>7$}{4:>7$}{5:>7$}{6:>7$}", name, max_width, n1, n2, n3, n4, n5, spacing);
+        println!(
+            "{0:<1$}{2:>7$}{3:>7$}{4:>7$}{5:>7$}{6:>7$}",
+            name, max_width, n1, n2, n3, n4, n5, spacing
+        );
 
         sum[0] += n1;
         sum[1] += n2;
@@ -114,10 +124,17 @@ fn parallel_coloring<G: StaticGraph + Send + 'static>(graphs: Vec<G>, names: Vec
         sum[4] += n5;
     }
 
-
-    println!("\n{0:<1$}{2:>7$.2}{3:>7$.2}{4:>7$.2}{5:>7$.2}{6:>7$.2}", "", max_width, sum[0] as f32/samples as f32,
-             sum[1] as f32/samples as f32, sum[2] as f32/samples as f32,
-             sum[3] as f32/samples as f32, sum[4] as f32/samples as f32, spacing);
+    println!(
+        "\n{0:<1$}{2:>7$.2}{3:>7$.2}{4:>7$.2}{5:>7$.2}{6:>7$.2}",
+        "",
+        max_width,
+        sum[0] as f32 / samples as f32,
+        sum[1] as f32 / samples as f32,
+        sum[2] as f32 / samples as f32,
+        sum[3] as f32 / samples as f32,
+        sum[4] as f32 / samples as f32,
+        spacing
+    );
 }
 
 fn all_colorings<G: StaticGraph>(g: &G) -> (usize, usize, usize, usize, usize) {

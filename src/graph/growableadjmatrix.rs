@@ -39,12 +39,12 @@ impl GrowableAdjMatrix {
         // u is now bigger and cannot be 0 as self edges are not allowed
         assert!(u >= 1);
 
-        u * (u-1) / 2 + v
+        u * (u - 1) / 2 + v
     }
 
     /// Return the size neede to accommodate ```n``` vertices
     fn get_size(n: usize) -> usize {
-        n * (n+1) / 2
+        n * (n + 1) / 2
     }
 
     /// Resize the capacity of the graph to accommodate ```n``` vertices
@@ -70,14 +70,18 @@ impl StaticGraph for GrowableAdjMatrix {
     fn with_capacity(n: usize) -> Self {
         let cap = n.max(1);
         let size = Self::get_size(cap);
-        Self { adj: vec![false; size], n, cap }
+        Self {
+            adj: vec![false; size],
+            n,
+            cap,
+        }
     }
 
     /// Construct an instance of this type from another ```StaticGraph``` implementor
     fn from_graph<G: StaticGraph>(graph: &G) -> Self {
         let mut g = Self::with_capacity(graph.vertices().count());
-        for (u,v) in graph.edges() {
-            g.add_edge(u,v);
+        for (u, v) in graph.edges() {
+            g.add_edge(u, v);
         }
         g
     }
@@ -101,7 +105,7 @@ impl StaticGraph for GrowableAdjMatrix {
     /// ```add_edge(u,v)``` has the same effect as ```add_edge(v,u)```
     /// as the graph captures undirected edges.
     /// Adding an edge that already exists has no effect.
-    fn add_edge(&mut self, u: usize, v: usize)  {
+    fn add_edge(&mut self, u: usize, v: usize) {
         // Self edges explicitly disallowed
         if u == v {
             return;
@@ -109,12 +113,12 @@ impl StaticGraph for GrowableAdjMatrix {
 
         // Double capacity can vertices could fit
         while u >= self.cap || v >= self.cap {
-            let size = 2*self.cap;
+            let size = 2 * self.cap;
             self.resize(size);
         }
 
-        self.n = self.n.max(u+1);
-        self.n = self.n.max(v+1);
+        self.n = self.n.max(u + 1);
+        self.n = self.n.max(v + 1);
 
         let idx1 = Self::get_idx(u, v);
         let idx2 = Self::get_idx(v, u);
@@ -123,13 +127,19 @@ impl StaticGraph for GrowableAdjMatrix {
     }
 
     /// Returns an iterator over all the edges in the graph.
-    fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a> {
-        Box::new(self.adj.iter().enumerate().filter(|(_, &b)| b).map(move |(i, _)| {
-            let u = ((1.0 + (1.0 + 8.0 * i as f32).sqrt()) / 2.0).floor() as usize;
-            let v = i - (u * (u-1) / 2);
+    fn edges<'a>(&'a self) -> Box<Iterator<Item = (usize, usize)> + 'a> {
+        Box::new(
+            self.adj
+                .iter()
+                .enumerate()
+                .filter(|(_, &b)| b)
+                .map(move |(i, _)| {
+                    let u = ((1.0 + (1.0 + 8.0 * i as f32).sqrt()) / 2.0).floor() as usize;
+                    let v = i - (u * (u - 1) / 2);
 
-            (v,u)
-        }))
+                    (v, u)
+                }),
+        )
     }
 
     /// Returns the number of vertices in the graph.
@@ -138,13 +148,17 @@ impl StaticGraph for GrowableAdjMatrix {
     }
 
     /// Returns an iterator over all the neighboring vertices in the graph.
-    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a> {
-        Box::new(self.edges().filter(move |(a,b)| *a == v || *b == v).map(move |(a,b)| {
-            if a == v {
-                b
-            } else {
-                a
-            }
-        }))
+    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item = usize> + 'a> {
+        Box::new(
+            self.edges().filter(move |(a, b)| *a == v || *b == v).map(
+                move |(a, b)| {
+                    if a == v {
+                        b
+                    } else {
+                        a
+                    }
+                },
+            ),
+        )
     }
 }

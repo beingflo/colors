@@ -1,18 +1,18 @@
-mod edgelist;
-mod adjmatrix;
-mod growableadjmatrix;
 mod adjlist;
+mod adjmatrix;
+mod edgelist;
+mod growableadjmatrix;
 mod hybrid;
 
-use std::path::Path;
+use rand::random;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use rand::random;
+use std::path::Path;
 
-pub use self::edgelist::EdgeList;
-pub use self::adjmatrix::AdjMatrix;
-pub use self::growableadjmatrix::GrowableAdjMatrix;
 pub use self::adjlist::AdjList;
+pub use self::adjmatrix::AdjMatrix;
+pub use self::edgelist::EdgeList;
+pub use self::growableadjmatrix::GrowableAdjMatrix;
 pub use self::hybrid::Hybrid;
 
 pub type Graph = AdjList;
@@ -44,16 +44,16 @@ pub trait StaticGraph: Sized {
     fn add_edge(&mut self, u: usize, v: usize);
 
     /// Returns an iterator over all the edges in the graph.
-    fn edges<'a>(&'a self) -> Box<Iterator<Item=(usize,usize)> + 'a>;
+    fn edges<'a>(&'a self) -> Box<Iterator<Item = (usize, usize)> + 'a>;
 
     /// Returns the number of vertices in the graph.
     fn num_vertices(&self) -> usize;
 
     /// Returns an iterator over all the neighboring vertices in the graph.
-    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item=usize> + 'a>;
+    fn neighbors<'a>(&'a self, v: usize) -> Box<Iterator<Item = usize> + 'a>;
 
     /// Returns an iterator over all the vertices in the graph.
-    fn vertices<'a>(&'a self) -> Box<Iterator<Item=usize> + 'a> {
+    fn vertices<'a>(&'a self) -> Box<Iterator<Item = usize> + 'a> {
         let n = self.num_vertices();
         if n == 0 {
             Box::new(std::iter::empty())
@@ -68,9 +68,9 @@ pub trait StaticGraph: Sized {
         let mut g = Self::with_capacity(n);
 
         for u in 0..n {
-            for v in u+1..n {
+            for v in u + 1..n {
                 if random::<f32>() < p {
-                    g.add_edge(u,v);
+                    g.add_edge(u, v);
                 }
             }
         }
@@ -83,8 +83,8 @@ pub trait StaticGraph: Sized {
     fn complete(n: usize) -> Self {
         let mut g = Self::with_capacity(n);
         for u in 0..n {
-            for v in (u+1)..n {
-                g.add_edge(u,v);
+            for v in (u + 1)..n {
+                g.add_edge(u, v);
             }
         }
         g
@@ -100,7 +100,6 @@ pub trait StaticGraph: Sized {
 
         max
     }
-
 }
 
 /// Load a graph from file in DIMACS ```.col``` format. ([Specification](http://lcs.ios.ac.cn/~caisw/Resource/about_DIMACS_graph_format.txt))
@@ -145,7 +144,7 @@ pub fn load_graph(name: impl AsRef<Path>) -> std::io::Result<Graph> {
 
             // Shift everything down as vertices are in [1,n]
             if let Some(ref mut graph) = graph {
-                graph.add_edge(u-1, v-1);
+                graph.add_edge(u - 1, v - 1);
             } else {
                 panic!("'e' line before 'p' line");
             }
@@ -158,7 +157,6 @@ pub fn load_graph(name: impl AsRef<Path>) -> std::io::Result<Graph> {
 
     Ok(graph.unwrap())
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -239,7 +237,9 @@ mod tests {
 
     impl<G: StaticGraph> GraphTester<G> {
         fn new() -> Self {
-            Self { _dummy: G::with_capacity(0) }
+            Self {
+                _dummy: G::with_capacity(0),
+            }
         }
 
         fn run(&self) {
@@ -266,60 +266,60 @@ mod tests {
 
         fn creation_empty(&self) {
             let g = G::with_capacity(0);
-            assert!(!g.has_edge(0,1));
+            assert!(!g.has_edge(0, 1));
         }
 
         fn creation_empty_selfedge(&self) {
             let g = G::with_capacity(0);
-            assert!(!g.has_edge(0,0));
+            assert!(!g.has_edge(0, 0));
         }
 
         fn creation_empty_with_capacity(&self) {
             let g = G::with_capacity(200);
-            assert!(!g.has_edge(0,0));
+            assert!(!g.has_edge(0, 0));
         }
 
         fn insertion_1(&self) {
             let mut g = G::with_capacity(2);
-            g.add_edge(0,1);
-            assert!(!g.has_edge(0,0));
-            assert!(g.has_edge(0,1));
-            assert!(g.has_edge(1,0));
+            g.add_edge(0, 1);
+            assert!(!g.has_edge(0, 0));
+            assert!(g.has_edge(0, 1));
+            assert!(g.has_edge(1, 0));
         }
 
         fn insertion_out_of_bounds(&self) {
             // Shouldn't panic
             // Some implementations will grow the graph, others will not
             let mut g = G::with_capacity(0);
-            g.add_edge(0,1);
+            g.add_edge(0, 1);
         }
 
         fn insertion_1_duplicate(&self) {
             let mut g = G::with_capacity(2);
-            g.add_edge(0,1);
-            g.add_edge(0,1);
-            g.add_edge(1,0);
-            assert!(!g.has_edge(0,0));
-            assert!(g.has_edge(0,1));
-            assert!(g.has_edge(1,0));
+            g.add_edge(0, 1);
+            g.add_edge(0, 1);
+            g.add_edge(1, 0);
+            assert!(!g.has_edge(0, 0));
+            assert!(g.has_edge(0, 1));
+            assert!(g.has_edge(1, 0));
         }
 
         fn insertion_selfedge(&self) {
             let mut g = G::with_capacity(2);
-            g.add_edge(0,0);
-            g.add_edge(1,1);
-            assert!(!g.has_edge(0,0));
-            assert!(!g.has_edge(0,1));
-            assert!(!g.has_edge(1,0));
-            assert!(!g.has_edge(1,1));
+            g.add_edge(0, 0);
+            g.add_edge(1, 1);
+            assert!(!g.has_edge(0, 0));
+            assert!(!g.has_edge(0, 1));
+            assert!(!g.has_edge(1, 0));
+            assert!(!g.has_edge(1, 1));
         }
 
         fn insertion_1_test_nonexistent(&self) {
             let mut g = G::with_capacity(2);
-            g.add_edge(0,1);
-            assert!(!g.has_edge(0,0));
-            assert!(!g.has_edge(1,1));
-            assert!(!g.has_edge(1,2));
+            g.add_edge(0, 1);
+            assert!(!g.has_edge(0, 0));
+            assert!(!g.has_edge(1, 1));
+            assert!(!g.has_edge(1, 2));
         }
 
         fn insertion_large(&self) {
@@ -327,13 +327,13 @@ mod tests {
             let mut g = G::with_capacity(n);
 
             for u in 0..n {
-                for v in (u+1)..n {
-                    g.add_edge(u,v);
+                for v in (u + 1)..n {
+                    g.add_edge(u, v);
                 }
             }
 
             assert!(g.has_edge(40, 11));
-            assert_eq!(g.edges().count(), n * (n-1) / 2);
+            assert_eq!(g.edges().count(), n * (n - 1) / 2);
         }
 
         fn insertion_large_with_duplicates(&self) {
@@ -342,22 +342,22 @@ mod tests {
 
             for u in 0..n {
                 for v in 0..n {
-                    g.add_edge(u,v);
+                    g.add_edge(u, v);
                 }
             }
 
             assert!(g.has_edge(40, 11));
-            assert_eq!(g.edges().count(), n * (n-1) / 2);
+            assert_eq!(g.edges().count(), n * (n - 1) / 2);
         }
 
         fn edges(&self) {
             let mut g = G::with_capacity(3);
-            g.add_edge(0,1);
-            g.add_edge(0,2);
+            g.add_edge(0, 1);
+            g.add_edge(0, 2);
 
-            assert!(g.edges().any(|x| x == (0,1)));
-            assert!(g.edges().any(|x| x == (0,2)));
-            assert!(!g.edges().any(|x| x == (1,2)));
+            assert!(g.edges().any(|x| x == (0, 1)));
+            assert!(g.edges().any(|x| x == (0, 2)));
+            assert!(!g.edges().any(|x| x == (1, 2)));
             assert_eq!(g.edges().count(), 2);
         }
 
@@ -370,8 +370,8 @@ mod tests {
         fn neighbors(&self) {
             let mut g = G::with_capacity(5);
 
-            g.add_edge(1,2);
-            g.add_edge(1,3);
+            g.add_edge(1, 2);
+            g.add_edge(1, 3);
 
             assert!(g.neighbors(1).any(|x| x == 2));
             assert!(g.neighbors(1).any(|x| x == 3));
@@ -389,8 +389,8 @@ mod tests {
         fn neighbors_empty(&self) {
             let mut g = G::with_capacity(5);
 
-            g.add_edge(1,2);
-            g.add_edge(1,3);
+            g.add_edge(1, 2);
+            g.add_edge(1, 3);
 
             assert!(!g.neighbors(5).any(|x| x == 1));
             assert_eq!(g.neighbors(5).count(), 0);
@@ -399,15 +399,15 @@ mod tests {
         fn max_degree(&self) {
             let mut g = G::with_capacity(5);
 
-            g.add_edge(1,2);
-            g.add_edge(1,3);
-            g.add_edge(1,1);
-            g.add_edge(1,2);
+            g.add_edge(1, 2);
+            g.add_edge(1, 3);
+            g.add_edge(1, 1);
+            g.add_edge(1, 2);
 
             assert_eq!(g.max_degree(), 2);
 
-            g.add_edge(2,3);
-            g.add_edge(2,4);
+            g.add_edge(2, 3);
+            g.add_edge(2, 4);
 
             assert_eq!(g.max_degree(), 3);
         }
@@ -428,7 +428,7 @@ mod tests {
 
             let num_edges = g.edges().count();
 
-            assert_eq!(num_edges, (100*99)/2);
+            assert_eq!(num_edges, (100 * 99) / 2);
         }
 
         fn random_empty(&self) {
@@ -443,7 +443,7 @@ mod tests {
             let n = 50;
             let g = G::complete(n);
 
-            assert_eq!(g.edges().count(), n * (n-1) / 2);
+            assert_eq!(g.edges().count(), n * (n - 1) / 2);
         }
     }
 
@@ -456,7 +456,10 @@ mod tests {
 
     impl<G1: StaticGraph, G2: StaticGraph> GraphInteropTester<G1, G2> {
         fn new() -> Self {
-            Self { _dummy1: G1::with_capacity(0), _dummy2: G2::with_capacity(0) }
+            Self {
+                _dummy1: G1::with_capacity(0),
+                _dummy2: G2::with_capacity(0),
+            }
         }
 
         fn run(&self) {
@@ -468,8 +471,8 @@ mod tests {
             let g1 = G1::random(100, 0.5);
             let g2 = G2::from_graph(&g1);
 
-            let edges1 = g1.edges().collect::<HashSet<(usize,usize)>>();
-            let edges2 = g2.edges().collect::<HashSet<(usize,usize)>>();
+            let edges1 = g1.edges().collect::<HashSet<(usize, usize)>>();
+            let edges2 = g2.edges().collect::<HashSet<(usize, usize)>>();
 
             assert_eq!(edges1, edges2);
         }
@@ -478,8 +481,8 @@ mod tests {
             let g1 = G2::random(100, 0.5);
             let g2 = G1::from_graph(&g1);
 
-            let edges1 = g1.edges().collect::<HashSet<(usize,usize)>>();
-            let edges2 = g2.edges().collect::<HashSet<(usize,usize)>>();
+            let edges1 = g1.edges().collect::<HashSet<(usize, usize)>>();
+            let edges2 = g2.edges().collect::<HashSet<(usize, usize)>>();
 
             assert_eq!(edges1, edges2);
         }
