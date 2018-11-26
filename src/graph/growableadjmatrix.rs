@@ -31,9 +31,7 @@ impl GrowableAdjMatrix {
     /// Get index into adjacency array from edge.
     fn get_idx(mut u: usize, mut v: usize) -> usize {
         if u < v {
-            let t = u;
-            u = v;
-            v = t;
+            std::mem::swap(&mut u, &mut v);
         }
 
         // u is now bigger and cannot be 0 as self edges are not allowed

@@ -26,7 +26,7 @@ impl StaticGraph for AdjMatrix {
     fn with_capacity(n: usize) -> Self {
         Self {
             adj: vec![false; n * n],
-            n: n,
+            n,
         }
     }
 

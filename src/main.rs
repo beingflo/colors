@@ -54,7 +54,7 @@ fn main() {
             graphs.push(g);
             names.push(name.into());
         }
-    }
+    };
 
     parallel_coloring(graphs, names);
 }

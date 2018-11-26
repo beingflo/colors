@@ -127,7 +127,7 @@ pub fn load_graph(name: impl AsRef<Path>) -> std::io::Result<Graph> {
         }
 
         if line.starts_with('p') {
-            let splits = line.split(" ").collect::<Vec<_>>();
+            let splits = line.split(' ').collect::<Vec<_>>();
             //assert_eq!(splits[1], "edge".to_string());
 
             let n = splits[2].parse::<usize>().unwrap();
@@ -138,7 +138,7 @@ pub fn load_graph(name: impl AsRef<Path>) -> std::io::Result<Graph> {
         }
 
         if line.starts_with('e') {
-            let splits = line.split(" ").collect::<Vec<_>>();
+            let splits = line.split(' ').collect::<Vec<_>>();
             let u = splits[1].parse::<usize>().unwrap();
             let v = splits[2].parse::<usize>().unwrap();
 

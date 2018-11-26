@@ -38,11 +38,7 @@ pub fn color<G: StaticGraph>(graph: &G) -> Coloring {
 
 /// Check whether coloring defines a color for all vertices that exist in the graph.
 pub fn compatible_coloring<G: StaticGraph>(graph: &G, coloring: &Coloring) -> bool {
-    if graph.num_vertices() == coloring.len() {
-        true
-    } else {
-        false
-    }
+    graph.num_vertices() == coloring.len()
 }
 
 /// Check whether no adjacent vertices are in conflict.
@@ -59,7 +55,7 @@ pub fn check_coloring<G: StaticGraph>(graph: &G, coloring: &Coloring) -> bool {
         }
     }
 
-    return true;
+    true
 }
 
 /// Returns the number of colors used in the coloring.
@@ -146,9 +142,8 @@ pub fn greedy_coloring<G: StaticGraph>(
 
     let coloring: Option<Coloring> = c.into_iter().collect();
     assert!(coloring.is_some());
-    let coloring = coloring.unwrap();
 
-    coloring
+    coloring.unwrap()
 }
 
 /// Returns a random-sequence greedy coloring of the graph where the vertices have
@@ -304,9 +299,8 @@ pub fn sdo_coloring<G: StaticGraph>(graph: &G) -> Coloring {
 
     let coloring: Option<Coloring> = c.into_iter().collect();
     assert!(coloring.is_some());
-    let coloring = coloring.unwrap();
 
-    coloring
+    coloring.unwrap()
 }
 
 /// Perform provided coloring method on graph ```n``` times and return the coloring with

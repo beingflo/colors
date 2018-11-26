@@ -46,9 +46,7 @@ impl StaticGraph for EdgeList {
     /// Queries whether an edge exists in the graph.
     fn has_edge(&self, mut u: usize, mut v: usize) -> bool {
         if u > v {
-            let t = u;
-            u = v;
-            v = t;
+            std::mem::swap(&mut u, &mut v);
         }
 
         self.edges.contains(&(u, v))
@@ -64,9 +62,7 @@ impl StaticGraph for EdgeList {
         }
 
         if u > v {
-            let t = u;
-            u = v;
-            v = t;
+            std::mem::swap(&mut u, &mut v);
         }
 
         self.n = self.n.max(v + 1);
