@@ -15,6 +15,7 @@ path = "src/main.rs"
 rand = "*"
 itertools = "0.7"
 num_cpus = "1.0"
+crossbeam = "0.5"
 
 [dev-dependencies]
 criterion = "0.2"
