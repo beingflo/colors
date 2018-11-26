@@ -307,22 +307,24 @@ pub fn sdo_coloring<G: StaticGraph>(graph: &G) -> Coloring {
 /// minimal number of colors. This is useful for randomized coloring methods such as
 /// ```sl_coloring``` and ```sdo_coloring``` to get more robust results.
 pub fn repeat_coloring<G: StaticGraph>(g: &G, c: fn(&G) -> Coloring, n: usize) -> Coloring {
-    let mut colorings: Vec<Coloring> = Vec::new();
+    let mut best_c = c(g);
+    let mut nc_best_c = num_colors(&best_c);
 
-    // Random initialization
-    for _ in 0..n {
-        colorings.push(c(g));
+    for _ in 1..n {
+        let new_c = c(g);
+        let nc_new_c = num_colors(&best_c);
+        if nc_new_c < nc_best_c {
+            best_c = new_c;
+            nc_best_c = nc_new_c;
+        }
     }
 
-    colorings.into_iter().map(|c| {
-        assert!(check_coloring(g, &c));
-        c
-    }).min_by_key(|c| num_colors(&c)).unwrap()
+    best_c
 }
 
 /// Fixes a potentially wrong coloring by choosing the lowest available color
 /// for the vertex with lower saturation degree of any conflicting edge.
-fn fix_coloring<G: StaticGraph>(g: &G, c: &mut Coloring) {
+pub fn fix_coloring<G: StaticGraph>(g: &G, c: &mut Coloring) {
     for (u,v) in g.edges() {
         // Conflict
         if c[u] == c[v] {
