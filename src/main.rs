@@ -27,7 +27,7 @@ fn main() {
         let p = 0.9;
 
         graphs = (0..samples).map(move |_| Graph::random(n, p)).collect::<Vec<Graph>>();
-        names = (0..samples).map(move |_| format!("Random({},{})", n, p).into()).collect::<Vec<String>>();
+        names = (0..samples).map(move |_| format!("Random({},{})", n, p)).collect::<Vec<String>>();
     } else {
         let path = &args[1];
         let meta = fs::metadata(path).unwrap();
@@ -44,7 +44,7 @@ fn main() {
             }
         } else {
             let file = Path::new(path);
-            let g = load_graph(file.clone()).unwrap();
+            let g = load_graph(file).unwrap();
             let name = file.file_name().unwrap().to_str().unwrap();
 
             graphs.push(g);
