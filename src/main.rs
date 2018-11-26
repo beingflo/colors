@@ -94,7 +94,7 @@ fn parallel_coloring<G: StaticGraph + Send + 'static>(graphs: Vec<G>, names: Vec
 
     // Print results
     let spacing = 8;
-    println!("{0:<1$}{2:>7$}{3:>7$}{4:>7$}{5:>7$}{6:>7$}", "", max_width, "rs", "cs", "lf", "sl", "sdo", spacing);
+    println!("{0:<1$}{2:>7$}{3:>7$}{4:>7$}{5:>7$}{6:>7$}\n", "", max_width, "rs", "cs", "lf", "sl", "sdo", spacing);
 
     let mut sum = [0; 5];
 
@@ -110,7 +110,7 @@ fn parallel_coloring<G: StaticGraph + Send + 'static>(graphs: Vec<G>, names: Vec
     }
 
 
-    println!("\n{0:<1$}{2:>7$}{3:>7$}{4:>7$}{5:>7$}{6:>7$}", "", max_width, sum[0] as f32/samples as f32,
+    println!("\n{0:<1$}{2:>7$.2}{3:>7$.2}{4:>7$.2}{5:>7$.2}{6:>7$.2}", "", max_width, sum[0] as f32/samples as f32,
              sum[1] as f32/samples as f32, sum[2] as f32/samples as f32,
              sum[3] as f32/samples as f32, sum[4] as f32/samples as f32, spacing);
 }
