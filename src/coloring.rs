@@ -303,6 +303,9 @@ pub fn sdo_coloring<G: StaticGraph>(graph: &G) -> Coloring {
     coloring
 }
 
+/// Perform coloring provided on graph ```n``` times and return the coloring with
+/// minimal number of colors. This is useful for randomized coloring methods such as
+/// ```sl_coloring``` and ```sdo_coloring``` to get a more robust result.
 pub fn repeat_coloring<G: StaticGraph>(g: &G, c: fn(&G) -> Coloring, n: usize) -> Coloring {
     let mut colorings: Vec<Coloring> = Vec::new();
 
