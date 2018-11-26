@@ -320,6 +320,8 @@ pub fn repeat_coloring<G: StaticGraph>(g: &G, c: fn(&G) -> Coloring, n: usize) -
     }).min_by_key(|c| num_colors(&c)).unwrap()
 }
 
+/// Fixes a potentially wrong coloring by choosing the lowest available color
+/// for the vertex with lower saturation degree of any conflicting edge.
 fn fix_coloring<G: StaticGraph>(g: &G, c: &mut Coloring) {
     for (u,v) in g.edges() {
         // Conflict
