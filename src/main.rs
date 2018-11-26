@@ -72,8 +72,14 @@ fn parallel_coloring<G: StaticGraph + Send + 'static>(graphs: Vec<G>, names: Vec
         tx_job.send((graph, name)).unwrap();
     }
 
+    // Drop original tx_job such that rx_.iter() will yield `None` when all jobs are done
+    drop(tx_job);
+
     for _ in 0..workers {
+        // Send results over tx_ to main thread
         let tx_ = tx_res.clone();
+
+        // Wait on rx_ for jobs by main thread
         let rx_ = rx_job.clone();
 
         // Spawn workers
@@ -88,8 +94,7 @@ fn parallel_coloring<G: StaticGraph + Send + 'static>(graphs: Vec<G>, names: Vec
         });
     }
 
-    // Drop original tx_job such that rx_.iter() will yield `None` when last tx_ is dropped
-    drop(tx_job);
+    // Drop original tx_res such that rx_res.iter() will yield `None` when last tx_ is dropped
     drop(tx_res);
 
     // Print results
