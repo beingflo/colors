@@ -715,10 +715,7 @@ mod tests {
 
         assert!(check_coloring(&g, &c));
 
-        // Line might not be 2-colored by rs
-        // in case of unfortunate vertex ordering
-        assert!(num_colors(&c) <= 3);
-        assert!(num_colors(&c) <= g.max_degree() + 1);
+        assert_eq!(num_colors(&c), 2);
     }
 
     #[test]
@@ -762,7 +759,7 @@ mod tests {
         assert!(num_colors(&c2) == 2);
         assert_eq!(num_colors(&c3), 2);
         assert_eq!(num_colors(&c4), 2);
-        assert!(num_colors(&c5) <= 4);
+        assert_eq!(num_colors(&c5), 2);
     }
 
     #[test]
@@ -798,7 +795,7 @@ mod tests {
         assert_eq!(num_colors(&c2), 2);
         assert_eq!(num_colors(&c3), 2);
         assert_eq!(num_colors(&c4), 2);
-        assert!(num_colors(&c5) >= 2 && num_colors(&c5) <= 3);
+        assert_eq!(num_colors(&c5), 2);
     }
 
     #[test]
