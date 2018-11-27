@@ -270,7 +270,10 @@ pub fn sdo_coloring<G: StaticGraph>(graph: &G) -> Coloring {
                 }
             }
 
-            if colors.len() > max_sd || (colors.len() == max_sd && graph.neighbors(v).count() > graph.neighbors(max_sd_idx).count()) {
+            if colors.len() > max_sd
+                || (colors.len() == max_sd
+                    && graph.neighbors(v).count() > graph.neighbors(max_sd_idx).count())
+            {
                 max_sd = colors.len();
                 max_sd_idx = v;
             }

@@ -23,7 +23,9 @@ fn main() {
         // Edge probability in each sample graph
         let p = 0.9;
 
-        (0..samples).map(move |_| JobType::Random(n,p, format!("Random({},{})", n, p))).collect::<Vec<JobType>>()
+        (0..samples)
+            .map(move |_| JobType::Random(n, p, format!("Random({},{})", n, p)))
+            .collect::<Vec<JobType>>()
     } else {
         let path = &args[1];
         let meta = fs::metadata(path).unwrap();
@@ -82,13 +84,13 @@ fn parallel_coloring(graphs: Vec<JobType>) {
                 let g = match graph {
                     JobType::Random(n, p, gname) => {
                         name = gname;
-                        Graph::random(n,p)
-                    },
+                        Graph::random(n, p)
+                    }
                     JobType::File(ref gname) => {
                         let file = Path::new(&gname);
                         name = file.file_name().unwrap().to_str().unwrap().to_string();
                         load_graph(file).unwrap()
-                    },
+                    }
                 };
 
                 // Color graph
