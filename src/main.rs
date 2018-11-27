@@ -13,10 +13,7 @@ use graml::graph::*;
 fn main() {
     let args = env::args().collect::<Vec<String>>();
 
-    let mut graphs = Vec::new();
-    let mut names = Vec::new();
-
-    if args.len() == 1 {
+    let graphs = if args.len() == 1 {
         // Run comparison on this many graphs
         let samples = 50;
 
@@ -26,41 +23,35 @@ fn main() {
         // Edge probability in each sample graph
         let p = 0.9;
 
-        graphs = (0..samples)
-            .map(move |_| Graph::random(n, p))
-            .collect::<Vec<Graph>>();
-        names = (0..samples)
-            .map(move |_| format!("Random({},{})", n, p))
-            .collect::<Vec<String>>();
+        (0..samples).map(move |_| JobType::Random(n,p, format!("Random({},{})", n, p))).collect::<Vec<JobType>>()
     } else {
         let path = &args[1];
         let meta = fs::metadata(path).unwrap();
+        let mut graphs = Vec::new();
 
         if meta.is_dir() {
             // Handle all the graphs
             for file in fs::read_dir(path).unwrap() {
                 let file = file.unwrap().path();
-                let g = load_graph(file.clone()).unwrap();
-                let name = file.file_name().unwrap().to_str().unwrap();
-
-                graphs.push(g);
-                names.push(name.into());
+                graphs.push(JobType::File(file.as_path().to_str().unwrap().to_string()));
             }
         } else {
-            let file = Path::new(path);
-            let g = load_graph(file).unwrap();
-            let name = file.file_name().unwrap().to_str().unwrap();
-
-            graphs.push(g);
-            names.push(name.into());
+            graphs.push(JobType::File(path.to_string()));
         }
+
+        graphs
     };
 
-    parallel_coloring(graphs, names);
+    parallel_coloring(graphs);
 }
 
-fn parallel_coloring<G: StaticGraph + Send + 'static>(graphs: Vec<G>, names: Vec<String>) {
-    assert_eq!(graphs.len(), names.len());
+#[derive(Debug, Clone)]
+enum JobType {
+    Random(usize, f32, String),
+    File(String),
+}
+
+fn parallel_coloring(graphs: Vec<JobType>) {
     let samples = graphs.len();
 
     // Number of processors
@@ -70,10 +61,8 @@ fn parallel_coloring<G: StaticGraph + Send + 'static>(graphs: Vec<G>, names: Vec
     let (tx_res, rx_res) = crossbeam::unbounded();
     let (tx_job, rx_job) = crossbeam::unbounded();
 
-    let mut max_width = 0;
-    for (graph, name) in graphs.into_iter().zip(names.into_iter()) {
-        max_width = max_width.max(name.len());
-        tx_job.send((graph, name)).unwrap();
+    for graph in graphs.into_iter() {
+        tx_job.send(graph).unwrap();
     }
 
     // Drop original tx_job such that rx_.iter() will yield `None` when all jobs are done
@@ -88,9 +77,22 @@ fn parallel_coloring<G: StaticGraph + Send + 'static>(graphs: Vec<G>, names: Vec
 
         // Spawn workers
         thread::spawn(move || {
-            for (graph, name) in rx_.iter() {
+            for graph in rx_.iter() {
+                let mut name;
+                let g = match graph {
+                    JobType::Random(n, p, gname) => {
+                        name = gname;
+                        Graph::random(n,p)
+                    },
+                    JobType::File(ref gname) => {
+                        let file = Path::new(&gname);
+                        name = file.file_name().unwrap().to_str().unwrap().to_string();
+                        load_graph(file).unwrap()
+                    },
+                };
+
                 // Color graph
-                let c = all_colorings(&graph);
+                let c = all_colorings(&g);
 
                 // Send result back to main thread
                 tx_.send((c, name)).unwrap();
@@ -103,31 +105,32 @@ fn parallel_coloring<G: StaticGraph + Send + 'static>(graphs: Vec<G>, names: Vec
 
     // Print results
     let spacing = 8;
+    let width = 20;
     println!(
         "{0:<1$}{2:>7$}{3:>7$}{4:>7$}{5:>7$}{6:>7$}\n",
-        "", max_width, "rs", "cs", "lf", "sl", "sdo", spacing
+        "", width, "rs", "cs", "lf", "sl", "sdo", spacing
     );
 
     let mut sum = [0; 5];
 
     // Iterate over all values received by worker threads
-    for ((n1, n2, n3, n4, n5), name) in rx_res.iter() {
+    for (n, name) in rx_res.iter() {
         println!(
             "{0:<1$}{2:>7$}{3:>7$}{4:>7$}{5:>7$}{6:>7$}",
-            name, max_width, n1, n2, n3, n4, n5, spacing
+            name, width, n.0, n.1, n.2, n.3, n.4, spacing
         );
 
-        sum[0] += n1;
-        sum[1] += n2;
-        sum[2] += n3;
-        sum[3] += n4;
-        sum[4] += n5;
+        sum[0] += n.0;
+        sum[1] += n.1;
+        sum[2] += n.2;
+        sum[3] += n.3;
+        sum[4] += n.4;
     }
 
     println!(
         "\n{0:<1$}{2:>7$.2}{3:>7$.2}{4:>7$.2}{5:>7$.2}{6:>7$.2}",
         "",
-        max_width,
+        width,
         sum[0] as f32 / samples as f32,
         sum[1] as f32 / samples as f32,
         sum[2] as f32 / samples as f32,
