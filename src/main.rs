@@ -109,40 +109,40 @@ fn parallel_coloring(graphs: Vec<JobType>) {
     let spacing = 8;
     let width = 20;
     println!(
-        "{0:<1$}{2:>7$}{3:>7$}{4:>7$}{5:>7$}{6:>7$}\n",
-        "", width, "rs", "cs", "lf", "sl", "sdo", spacing
+        "{0:<1$}{3:>2$}{4:>2$}{5:>2$}{6:>2$}{7:>2$}\n",
+        "", width, spacing, "rs", "cs", "lf", "sl", "sdo"
     );
 
-    let mut sum = [0; 5];
+    let mut sum = vec![0; 6];
 
     // Iterate over all values received by worker threads
     for (n, name) in rx_res.iter() {
         println!(
-            "{0:<1$}{2:>7$}{3:>7$}{4:>7$}{5:>7$}{6:>7$}",
-            name, width, n.0, n.1, n.2, n.3, n.4, spacing
+            "{0:<1$}{3:>2$}{4:>2$}{5:>2$}{6:>2$}{7:>2$}",
+            name, width, spacing, n[0], n[1], n[2], n[3], n[4]
         );
 
-        sum[0] += n.0;
-        sum[1] += n.1;
-        sum[2] += n.2;
-        sum[3] += n.3;
-        sum[4] += n.4;
+        sum[0] += n[0];
+        sum[1] += n[1];
+        sum[2] += n[2];
+        sum[3] += n[3];
+        sum[4] += n[4];
     }
 
     println!(
-        "\n{0:<1$}{2:>7$.2}{3:>7$.2}{4:>7$.2}{5:>7$.2}{6:>7$.2}",
+        "\n{0:<1$}{3:>2$.2}{4:>2$.2}{5:>2$.2}{6:>2$.2}{7:>2$.2}",
         "",
         width,
+        spacing,
         sum[0] as f32 / samples as f32,
         sum[1] as f32 / samples as f32,
         sum[2] as f32 / samples as f32,
         sum[3] as f32 / samples as f32,
         sum[4] as f32 / samples as f32,
-        spacing
     );
 }
 
-fn all_colorings<G: StaticGraph>(g: &G) -> (usize, usize, usize, usize, usize) {
+fn all_colorings<G: StaticGraph>(g: &G) -> Vec<usize> {
     // Perform colorings
     let c1 = rs_coloring(g);
     let c2 = cs_coloring(g);
@@ -164,5 +164,5 @@ fn all_colorings<G: StaticGraph>(g: &G) -> (usize, usize, usize, usize, usize) {
     let n4 = num_colors(&c4);
     let n5 = num_colors(&c5);
 
-    (n1, n2, n3, n4, n5)
+    vec![n1, n2, n3, n4, n5]
 }
