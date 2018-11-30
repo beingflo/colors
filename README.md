@@ -10,7 +10,7 @@ Install Rust from the [Rust website](https://www.rust-lang.org/)
 To build, clone the repository and execute
 
 ```
-    cargo build --release
+cargo build --release
 ```
 
 
