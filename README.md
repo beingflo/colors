@@ -24,7 +24,8 @@ cargo run --release -- /path/to/dir/of/graphs
 to run an evaluation on all the graphs in the directory.
 
 The graphs have to be provided in the DIMACS .col format. See the documentation
-for ```load_graph``` for more details.
+for ```load_graph``` for more details. Some compatible graphs can be found
+[here](http://www.info.univ-angers.fr/~porumbel/graphs/).
 
 
 ### Documentation
