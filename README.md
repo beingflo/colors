@@ -4,6 +4,16 @@ graml implements heuristics and other methods for graph coloring.
 
 This project contains a library as well as a binary application making use of the library.
 
+### Building
+Install Rust from the [Rust website](https://www.rust-lang.org/)
+
+To build, clone the repository and execute
+
+```
+    cargo build --release
+```
+
+
 ### Running
 To see a comparison between different coloring methods on random graphs, run
 ```
