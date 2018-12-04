@@ -1,4 +1,4 @@
-use rand::random;
+use rand::{ random, thread_rng, seq::SliceRandom };
 use std::collections::{HashSet, VecDeque};
 
 use graph::StaticGraph;
@@ -359,18 +359,31 @@ pub fn fix_coloring<G: StaticGraph>(g: &G, c: &mut Coloring) {
 }
 
 pub fn genetic_coloring<G: StaticGraph>(g: &G) -> Coloring {
-    let n = 100;
-    let gen = 100;
+    let n = 50;
+    let gen = 20;
     let n_vert = g.num_vertices();
-    let mut colorings: Vec<Coloring> = Vec::new();
+    let mut orderings: Vec<(Vec<usize>, usize)> = Vec::new();
 
     // Random initialization
     for _ in 0..n {
-        colorings.push(sl_coloring(g));
+        let mut permutation = (0..n_vert).collect::<Vec<usize>>();
+        &mut permutation[..].shuffle(&mut thread_rng());
+
+        orderings.push((permutation, 0));
     }
 
     for _ in 0..gen {
-        colorings.sort_by(|a, b| num_colors(a).cmp(&num_colors(b)));
+        // Compute num colors
+        for i in 0..n {
+            let coloring = greedy_coloring(g, orderings[i].0.iter().cloned());
+            assert!(check_coloring(g, &coloring));
+            let num_col = num_colors(&coloring);
+            orderings[i].1 = num_col;
+        }
+
+        orderings.sort_by(|a, b| {
+            a.1.cmp(&b.1)
+        });
 
         for i in n / 2..n {
             let mom = random::<usize>() % (n / 2);
@@ -378,19 +391,32 @@ pub fn genetic_coloring<G: StaticGraph>(g: &G) -> Coloring {
 
             let split = random::<usize>() % n_vert;
 
-            for j in 0..n_vert {
-                if j < split {
-                    colorings[i][j] = colorings[mom][j];
-                } else {
-                    colorings[i][j] = colorings[dad][j];
-                }
+            // Take first 'split' elements from mom
+            let mut have = vec![false; n_vert];
+            for j in 0..split {
+                let v = orderings[mom].0[j];
+                orderings[i].0[j] = v;
+                have[v] = true;
             }
 
-            fix_coloring(g, &mut colorings[i]);
+            // Take remaining elements in order specified by dad
+            // -> Leads to a proper permutation
+            let mut j = split;
+            let mut k = 0;
+            while j < n_vert && k < n_vert {
+                let v = orderings[dad].0[k];
+                if !have[v] {
+                    orderings[i].0[j] = v;
+                    have[v] = true;
+                    j += 1;
+                }
+
+                k += 1;
+            }
         }
     }
 
-    colorings.remove(0)
+    greedy_coloring(g, orderings.remove(0).0.iter().cloned())
 }
 
 #[cfg(test)]
