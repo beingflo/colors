@@ -360,7 +360,8 @@ pub fn fix_coloring<G: StaticGraph>(g: &G, c: &mut Coloring) {
 
 pub fn genetic_coloring<G: StaticGraph>(g: &G) -> Coloring {
     let n = 50;
-    let gen = 20;
+    let gen = 50;
+    let mutation_p = 0.2;
     let n_vert = g.num_vertices();
     let mut orderings: Vec<(Vec<usize>, usize)> = Vec::new();
 
@@ -412,6 +413,18 @@ pub fn genetic_coloring<G: StaticGraph>(g: &G) -> Coloring {
                 }
 
                 k += 1;
+            }
+
+            // Mutate
+            // -> Swap two vertices at random
+            for j in 0..n_vert-1 {
+                let p = random::<f32>();
+
+                if p < mutation_p {
+                    let a = orderings[i].0[j];
+                    orderings[i].0[j] = orderings[i].0[j+1];
+                    orderings[i].0[j+1] = a;
+                }
             }
         }
     }
