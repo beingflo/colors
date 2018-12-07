@@ -368,7 +368,7 @@ pub fn genetic_coloring<G: StaticGraph>(g: &G) -> Coloring {
     // Random initialization
     for _ in 0..n {
         let mut permutation = (0..n_vert).collect::<Vec<usize>>();
-        &mut permutation[..].shuffle(&mut thread_rng());
+        permutation[..].shuffle(&mut thread_rng());
 
         orderings.push((permutation, 0));
     }
@@ -421,9 +421,7 @@ pub fn genetic_coloring<G: StaticGraph>(g: &G) -> Coloring {
                 let p = random::<f32>();
 
                 if p < mutation_p {
-                    let a = orderings[i].0[j];
-                    orderings[i].0[j] = orderings[i].0[j+1];
-                    orderings[i].0[j+1] = a;
+                    orderings[i].0.swap(j, j+1)
                 }
             }
         }
