@@ -435,7 +435,7 @@ pub fn genetic_coloring<G: StaticGraph>(g: &G) -> Coloring {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use graph::*;
+    use crate::graph::*;
 
     #[test]
     fn coloring_creation_empty() {

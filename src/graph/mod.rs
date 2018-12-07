@@ -160,7 +160,7 @@ pub fn load_graph(name: impl AsRef<Path>) -> std::io::Result<Graph> {
 
 #[cfg(test)]
 mod tests {
-    use graph::*;
+    use crate::graph::*;
     use std::collections::HashSet;
 
     #[test]
