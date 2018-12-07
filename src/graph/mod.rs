@@ -32,7 +32,7 @@ pub trait StaticGraph: Sized {
     fn with_capacity(n: usize) -> Self;
 
     /// Construct an instance of this type from another ```StaticGraph``` implementor
-    fn from_graph<G: StaticGraph>(&G) -> Self;
+    fn from_graph<G: StaticGraph>(graph: &G) -> Self;
 
     /// Queries whether an edge exists in the graph.
     fn has_edge(&self, u: usize, v: usize) -> bool;

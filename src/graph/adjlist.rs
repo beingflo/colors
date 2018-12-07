@@ -1,6 +1,6 @@
 use itertools::Itertools;
 
-use graph::StaticGraph;
+use crate::graph::StaticGraph;
 
 /// Graph datastructure implemented as an adjacency list.
 /// The graph is undirected and unweighted - only the connectivity pattern of

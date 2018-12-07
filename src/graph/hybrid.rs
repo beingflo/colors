@@ -1,8 +1,8 @@
 use std::iter::Iterator;
 
-use graph::AdjList;
-use graph::EdgeList;
-use graph::StaticGraph;
+use crate::graph::AdjList;
+use crate::graph::EdgeList;
+use crate::graph::StaticGraph;
 
 /// Graph datastructure implemented as a set of edges as well as an adjacency list.
 /// The graph is undirected and unweighted - only the connectivity pattern of

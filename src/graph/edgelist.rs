@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::iter::Iterator;
 
-use graph::StaticGraph;
+use crate::graph::StaticGraph;
 
 /// Graph datastructure implemented as a set of edges.
 /// The graph is undirected and unweighted - only the connectivity pattern of

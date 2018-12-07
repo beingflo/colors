@@ -1,7 +1,3 @@
-extern crate crossbeam;
-extern crate graml;
-extern crate num_cpus;
-
 use std::env;
 use std::fs;
 use std::path::Path;
@@ -80,7 +76,7 @@ fn parallel_coloring(graphs: Vec<JobType>) {
         // Spawn workers
         thread::spawn(move || {
             for graph in rx_.iter() {
-                let mut name;
+                let name;
                 let g = match graph {
                     JobType::Random(n, p, gname) => {
                         name = gname;

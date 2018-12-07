@@ -1,7 +1,7 @@
 use rand::{ random, thread_rng, seq::SliceRandom };
 use std::collections::{HashSet, VecDeque};
 
-use graph::StaticGraph;
+use crate::graph::StaticGraph;
 
 /// Coloring type.
 /// This maps from vertices to colors.
