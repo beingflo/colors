@@ -46,7 +46,7 @@ cargo doc --open
 
 ### Testing 
 A comprehensive test set is provided. If a new graph implementation is added, consider
-adding it to the test suite in ```$repo$/src/graph/mod.rs```. To run the tests, execute
+adding it to the test suite in ```src/graph/mod.rs```. To run the tests, execute
 ```
 cargo test --release
 ```
@@ -57,4 +57,4 @@ implementations, execute
 ```
 cargo bench
 ```
-and navigate your browser to ```$repo$/target/criterion/report/index.html```.
+and navigate your browser to ```target/criterion/report/index.html```.
