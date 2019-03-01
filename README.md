@@ -7,7 +7,7 @@ This project contains a library as well as a binary application making use of th
 ### Building
 Install Rust from the [Rust website](https://www.rust-lang.org/)
 
-To build, clone the repository and execute
+Clone the repository and execute
 
 ```
 cargo build --release
@@ -41,9 +41,8 @@ for ```load_graph``` for more details. Some compatible graphs can be found
 ### Documentation
 To view documentation of the library, execute
 ```
-cargo doc
+cargo doc --open
 ```
-and navigate your browser to ```$repo$/target/doc/graml/index.html```
 
 ### Testing 
 A comprehensive test set is provided. If a new graph implementation is added, consider
